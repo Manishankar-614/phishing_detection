@@ -140,11 +140,11 @@ export default function DetectionPage() {
 
         <div>
           <h1>
-            Phishing Detection
+            PhishGuard AI
           </h1>
 
           <p>
-            Analyze email, URL and behavioral signals
+            Multi-Modal Threat & Phishing Intelligence Platform (BERT + CNN + Isolation Forest)
           </p>
         </div>
 
