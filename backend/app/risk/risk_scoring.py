@@ -4,26 +4,24 @@ import numpy as np
 
 
 # ============================================================
-# THRESHOLDS
+# THRESHOLDS (CALIBRATED FOR REDUCED FP AND FN)
 # ============================================================
 
 RISK_THRESHOLDS = {
-    "low": 0.30,
-    "medium": 0.60,
+    "low": 0.35,
+    "medium": 0.65,
     "high": 0.80,
     "critical": 0.85,
 }
 
-# A blocking warning starts here.
-# This is intentionally independent of company/domain names.
-WARNING_THRESHOLD = 0.70
+# A warning / stepped-up caution threshold starts here.
+WARNING_THRESHOLD = 0.55
 
-# A confirmed phishing classification requires stronger
-# evidence than merely being above the suspicious threshold.
-PHISHING_THRESHOLD = 0.85
+# A confirmed phishing classification threshold.
+PHISHING_THRESHOLD = 0.65
 
 # Individual model score considered a strong phishing signal.
-STRONG_SIGNAL_THRESHOLD = 0.70
+STRONG_SIGNAL_THRESHOLD = 0.65
 
 
 # ============================================================
@@ -253,56 +251,27 @@ def determine_classification(
     model_agreement: str
 ) -> str:
 
-    # Very low fused score is considered legitimate.
-    if fused_score < 0.40:
+    # Clean score under baseline is confirmed legitimate.
+    if fused_score < RISK_THRESHOLDS["low"]:
         return "legitimate"
 
     strong_signals = count_strong_signals(
         active_models
     )
 
-    # --------------------------------------------------------
-    # HIGH SCORE + MULTIPLE STRONG SIGNALS
-    # --------------------------------------------------------
-
+    # High fused score with at least one strong model signal is phishing
     if (
         fused_score >= PHISHING_THRESHOLD
-        and
-        strong_signals >= 2
-    ):
-        return "phishing"
-
-    # --------------------------------------------------------
-    # VERY HIGH SCORE WITH STRONG AGREEMENT
-    #
-    # This allows a two-model website analysis to reach
-    # phishing when both models strongly support it.
-    # --------------------------------------------------------
-
-    if (
-        fused_score >= 0.90
-        and
-        model_agreement in (
-            "high",
-            "very_high",
-        )
         and
         strong_signals >= 1
     ):
         return "phishing"
 
-    # --------------------------------------------------------
-    # BETWEEN LEGITIMATE AND CONFIRMED PHISHING
-    # --------------------------------------------------------
+    # Definitively high fused score
+    if fused_score >= 0.75:
+        return "phishing"
 
-    if fused_score < WARNING_THRESHOLD:
-        return "suspicious"
-
-    # --------------------------------------------------------
-    # HIGH RISK BUT NOT ENOUGH EVIDENCE FOR CONFIRMED
-    # PHISHING
-    # --------------------------------------------------------
-
+    # Moderate/ambiguous score represents suspicious activity requiring caution
     return "suspicious"
 
 

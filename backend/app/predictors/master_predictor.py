@@ -827,58 +827,46 @@ def create_email_fusion(
 
     if has_meaningful_url:
 
-        email_weight = 0.65
+        email_weight = 0.55
 
-        url_weight = 0.30
+        url_weight = 0.40
 
         behavior_weight = 0.05
 
-
         fused_score = (
-
-            email_score
-            *
-            email_weight
-
-            +
-
-            url_score
-            *
-            url_weight
-
-            +
-
-            behavior_score
-            *
-            behavior_weight
-
+            email_score * email_weight
+            + url_score * url_weight
+            + behavior_score * behavior_weight
         )
 
+        # ----------------------------------------------------
+        # ANTI-FALSE-NEGATIVE: DOMINANT MALICIOUS LINK
+        # A dangerous URL must not be diluted by clean email text
+        # ----------------------------------------------------
+        if url_score >= 0.75:
+            fused_score = max(fused_score, url_score * 0.90, 0.75)
+
+        elif email_score >= 0.85 and url_score >= 0.50:
+            fused_score = max(fused_score, 0.80)
+
+        # ----------------------------------------------------
+        # ANTI-FALSE-POSITIVE: CLEAN TRANSACTIONAL EMAIL
+        # Clean URLs + moderate email score should not trigger false alarm
+        # ----------------------------------------------------
+        elif url_score < 0.15 and email_score < 0.65:
+            fused_score = min(fused_score, 0.30)
 
         scores = [
-
             email_score,
-
             url_score,
-
             behavior_score
-
         ]
 
-
         weights = {
-
-            "email":
-                email_weight,
-
-            "url":
-                url_weight,
-
-            "behavior":
-                behavior_weight
-
+            "email": email_weight,
+            "url": url_weight,
+            "behavior": behavior_weight
         }
-
 
     else:
 
@@ -886,42 +874,20 @@ def create_email_fusion(
 
         behavior_weight = 0.10
 
-
         fused_score = (
-
-            email_score
-            *
-            email_weight
-
-            +
-
-            behavior_score
-            *
-            behavior_weight
-
+            email_score * email_weight
+            + behavior_score * behavior_weight
         )
 
-
         scores = [
-
             email_score,
-
             behavior_score
-
         ]
 
-
         weights = {
-
-            "email":
-                email_weight,
-
-            "url":
-                0.0,
-
-            "behavior":
-                behavior_weight
-
+            "email": email_weight,
+            "url": 0.0,
+            "behavior": behavior_weight
         }
 
 
@@ -941,25 +907,14 @@ def create_email_fusion(
     # --------------------------------------------------------
 
     model_values = {
-
-        "email":
-            email_score,
-
-        "url":
-            url_score,
-
-        "behavior":
-            behavior_score
-
+        "email": email_score,
+        "url": url_score,
+        "behavior": behavior_score
     }
 
-
     dominant_model = max(
-
         model_values,
-
         key=model_values.get
-
     )
 
 
@@ -968,17 +923,10 @@ def create_email_fusion(
     # --------------------------------------------------------
 
     contributions = {
-
-        name:
-            safe_score(
-                model_values[name]
-                *
-                weights[name]
-            )
-
-        for name
-        in model_values
-
+        name: safe_score(
+            model_values[name] * weights.get(name, 0.0)
+        )
+        for name in model_values
     }
 
 
@@ -987,80 +935,38 @@ def create_email_fusion(
     # --------------------------------------------------------
 
     return {
-
-        "fused_score":
-            safe_score(
-                fused_score
-            ),
-
-        "fusion_vector":
-            scores,
-
-        "weights":
-            weights,
-
-        "contributions":
-            contributions,
-
+        "fused_score": safe_score(fused_score),
+        "fusion_vector": scores,
+        "weights": weights,
         "models": {
-
             "email": {
-
-                "score":
-                    email_score,
-
-                "classification":
-                    (
-                        "phishing"
-                        if email_score >= 0.50
-                        else "legitimate"
-                    )
-
+                "score": email_score,
+                "classification": (
+                    "phishing"
+                    if email_score >= 0.50
+                    else "legitimate"
+                )
             },
-
             "url": {
-
-                "score":
-                    url_score,
-
-                "classification":
-                    (
-                        "phishing"
-                        if url_score >= 0.50
-                        else (
-                            "not_analyzed"
-                            if not has_meaningful_url
-                            else "legitimate"
-                        )
-                    )
-
+                "score": url_score,
+                "classification": (
+                    "phishing"
+                    if url_score >= 0.50
+                    else "legitimate"
+                )
             },
-
             "behavior": {
-
-                "score":
-                    behavior_score,
-
-                "classification":
-                    (
-                        "anomalous"
-                        if behavior_score >= 0.50
-                        else "normal"
-                    )
-
+                "score": behavior_score,
+                "classification": (
+                    "anomalous"
+                    if behavior_score >= 0.50
+                    else "normal"
+                )
             }
-
         },
-
-        "model_agreement":
-            model_agreement,
-
-        "dominant_model":
-            dominant_model,
-
-        "mode":
-            "email"
-
+        "model_agreement": model_agreement,
+        "dominant_model": dominant_model,
+        "mode": "email"
     }
 
 
@@ -1081,33 +987,26 @@ def create_website_fusion(
         behavior_score
     )
 
+    url_weight = 0.85
 
-    url_weight = 0.90
-
-    behavior_weight = 0.10
-
+    behavior_weight = 0.15
 
     fused_score = (
-
-        url_score
-        *
-        url_weight
-
-        +
-
-        behavior_score
-        *
-        behavior_weight
-
+        url_score * url_weight
+        + behavior_score * behavior_weight
     )
 
+    # If the URL is definitively dangerous, prevent behavior from diluting it
+    if url_score >= 0.75:
+        fused_score = max(fused_score, url_score)
+
+    # If URL is clearly benign and no high-risk anomaly, dampen false positives
+    elif url_score < 0.20 and behavior_score < 0.70:
+        fused_score = min(fused_score, 0.30)
 
     scores = [
-
         url_score,
-
         behavior_score
-
     ]
 
 

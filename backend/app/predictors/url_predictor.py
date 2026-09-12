@@ -1,5 +1,6 @@
 from pathlib import Path
 import pickle
+import re
 
 import numpy as np
 import pandas as pd
@@ -362,9 +363,30 @@ def predict_url(url):
         probability
     )
 
+    # --------------------------------------------------------
+    # STRUCTURAL CALIBRATION (REDUCE FP & FN)
+    # --------------------------------------------------------
+    domain_part = (
+        url.split("://", 1)[-1]
+        .split("/", 1)[0]
+        .split(":", 1)[0]
+        .strip()
+    )
+
+    # 1. Direct IPv4 host detection (e.g. http://124.6.185.122/bin.sh) -> Strong indicator
+    is_ipv4_host = bool(
+        re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", domain_part)
+    )
+    if is_ipv4_host:
+        probability = max(probability, 0.85)
+
+    # 2. Deceptive multi-level subdomain depth (>= 4 dots in host)
+    elif domain_part.count(".") >= 4:
+        probability = max(probability, 0.70)
+
     classification = (
         "phishing"
-        if probability >= 0.5
+        if probability >= 0.50
         else "legitimate"
     )
 
