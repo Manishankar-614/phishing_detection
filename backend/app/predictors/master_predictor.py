@@ -1,5 +1,7 @@
 from pathlib import Path
+import re
 import sys
+import numpy as np
 
 
 # ============================================================
@@ -1197,38 +1199,41 @@ def analyze_input(
     if email_urls is None:
         email_urls = []
 
-
     if email_links is None:
         email_links = []
-
 
     if not isinstance(
         behavior_data,
         dict
     ):
-
         raise ValueError(
             "Behavior data must be an object."
         )
 
+    email_text = (email_text or "").strip()
+    url = (url or "").strip()
+
+    # Extract embedded URLs from email body
+    extracted_urls = re.findall(r"https?://[^\s<>\"'\)]+", email_text) if email_text else []
+
+    # Merge explicit URL and body links
+    merged_email_urls = list(email_urls)
+    if url and url not in merged_email_urls:
+        merged_email_urls.append(url)
+    for ext_u in extracted_urls:
+        if ext_u not in merged_email_urls:
+            merged_email_urls.append(ext_u)
 
     # ========================================================
-    # EMAIL MODE
+    # EMAIL / HYBRID MODE
     # ========================================================
 
-    if is_email_page:
-
-        email_text = (
-            email_text or ""
-        ).strip()
-
+    if is_email_page or email_text:
 
         if not email_text:
-
             raise ValueError(
                 "Email content is required."
             )
-
 
         # ----------------------------------------------------
         # BERT
@@ -1238,14 +1243,11 @@ def analyze_input(
             email_text
         )
 
-
         if not isinstance(
             email_result,
             dict
         ):
-
             email_result = {}
-
 
         email_score = safe_score(
             email_result.get(
@@ -1254,14 +1256,13 @@ def analyze_input(
             )
         )
 
-
         # ----------------------------------------------------
         # CNN URL
         # ----------------------------------------------------
 
         email_url_result = (
             analyze_email_urls(
-                email_urls=email_urls,
+                email_urls=merged_email_urls,
                 email_links=email_links
             )
         )

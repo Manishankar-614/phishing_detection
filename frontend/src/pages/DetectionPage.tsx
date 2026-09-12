@@ -227,7 +227,7 @@ export default function DetectionPage() {
         ? trackerRef.current.getBehavior()
         : behavior;
 
-      const isEmailMode = activeTab === "email";
+      const isEmailMode = activeTab === "email" || activeTab === "hybrid";
 
       const response = await analyzePhishing({
         email: email.trim(),

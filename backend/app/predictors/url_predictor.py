@@ -366,23 +366,55 @@ def predict_url(url):
     # --------------------------------------------------------
     # STRUCTURAL CALIBRATION (REDUCE FP & FN)
     # --------------------------------------------------------
-    domain_part = (
-        url.split("://", 1)[-1]
-        .split("/", 1)[0]
-        .split(":", 1)[0]
-        .strip()
+    raw_url = url.strip()
+    url_lower = raw_url.lower()
+
+    # Extract hostname safely
+    clean_host = url_lower
+    if "://" in clean_host:
+        clean_host = clean_host.split("://", 1)[1]
+    clean_host = clean_host.split("/", 1)[0].split("?", 1)[0].split("#", 1)[0].split(":", 1)[0].strip()
+
+    # Abuse TLDs commonly used in automated phishing campaigns
+    risky_tlds = [
+        ".tk", ".ml", ".ga", ".cf", ".gq", ".top", ".xyz", ".buzz",
+        ".fit", ".icu", ".sbs", ".surf", ".work", ".click", ".rest",
+        ".zip", ".mov", ".stream", ".country", ".bar"
+    ]
+
+    # Deceptive brand impersonation markers in the hostname itself
+    deceptive_domain_keywords = [
+        "secure-login", "login-verify", "account-update", "banking-verify",
+        "paypal-auth", "appleid-support", "microsoft-security", "auth0-verify",
+        "billing-security", "portal-security", "verify-id", "support-portal-auth"
+    ]
+
+    # Structural threat flags
+    has_ipv4_host = bool(re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", clean_host))
+    has_userinfo_masking = "@" in raw_url.split("/", 3)[-1] if "://" in raw_url else "@" in raw_url
+    has_risky_tld = any(clean_host.endswith(tld) for tld in risky_tlds)
+    has_deceptive_host = any(kw in clean_host for kw in deceptive_domain_keywords)
+    has_excessive_subdomains = clean_host.count(".") >= 4
+    has_excessive_hyphens = clean_host.count("-") >= 3
+
+    is_domain_suspicious = (
+        has_ipv4_host
+        or has_userinfo_masking
+        or has_risky_tld
+        or has_deceptive_host
+        or has_excessive_subdomains
+        or has_excessive_hyphens
     )
 
-    # 1. Direct IPv4 host detection (e.g. http://124.6.185.122/bin.sh) -> Strong indicator
-    is_ipv4_host = bool(
-        re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", domain_part)
-    )
-    if is_ipv4_host:
-        probability = max(probability, 0.85)
-
-    # 2. Deceptive multi-level subdomain depth (>= 4 dots in host)
-    elif domain_part.count(".") >= 4:
-        probability = max(probability, 0.70)
+    if is_domain_suspicious:
+        # High-confidence structural attack signature
+        probability = max(probability, 0.88)
+    else:
+        # Standard clean domain: suppress query string / auth path false alarms from CNN
+        if clean_host.count(".") <= 3 and clean_host.count("-") <= 2:
+            probability = min(probability * 0.35, 0.20)
+        else:
+            probability = min(probability * 0.60, 0.35)
 
     classification = (
         "phishing"
