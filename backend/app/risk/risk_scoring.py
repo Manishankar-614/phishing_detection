@@ -1,7 +1,5 @@
 from typing import Dict, Optional
 
-import numpy as np
-
 
 # ============================================================
 # THRESHOLDS (CALIBRATED FOR REDUCED FP AND FN)
