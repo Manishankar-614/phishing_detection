@@ -1,0 +1,4 @@
+backend/trained_models/**/*.safetensors filter=lfs diff=lfs merge=lfs -text
+backend/trained_models/**/*.keras filter=lfs diff=lfs merge=lfs -text
+backend/trained_models/**/*.pkl filter=lfs diff=lfs merge=lfs -text
+backend/trained_models/**/*.json filter=lfs diff=lfs merge=lfs -text

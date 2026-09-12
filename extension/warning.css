@@ -1,0 +1,26 @@
+/*
+ * Phishing Detection AI
+ *
+ * The warning interface is rendered inside
+ * a Shadow DOM by warning.js.
+ *
+ * This file intentionally contains only
+ * a harmless host reset so the extension
+ * does not interfere with the website.
+ */
+
+#phishing-ai-warning-host {
+    all: initial !important;
+
+    position: fixed !important;
+
+    inset: 0 !important;
+
+    width: 100vw !important;
+
+    height: 100vh !important;
+
+    z-index: 2147483647 !important;
+
+    pointer-events: auto !important;
+}

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Phishing Detection AI</title>
+
+    <link
+        rel="stylesheet"
+        href="popup.css"
+    >
+
+</head>
+
+
+<body>
+
+    <main class="popup">
+
+        <!-- HEADER -->
+
+        <header class="header">
+
+            <div class="brand">
+
+                <div class="brand-icon">
+                    🛡️
+                </div>
+
+                <div>
+
+                    <h1>
+                        Phishing Detection AI
+                    </h1>
+
+                    <p>
+                        Intelligent Web Protection
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div
+                id="protection-dot"
+                class="protection-dot"
+            ></div>
+
+        </header>
+
+
+        <!-- CURRENT WEBSITE -->
+
+        <section class="site-card">
+
+            <div class="site-label">
+                CURRENT WEBSITE
+            </div>
+
+            <div
+                id="current-url"
+                class="site-url"
+            >
+                Loading...
+            </div>
+
+        </section>
+
+
+        <!-- WARNING ACTIVE -->
+
+        <section
+            id="warning-state"
+            class="warning-state hidden"
+        >
+
+            <div class="warning-icon">
+                ⚠️
+            </div>
+
+            <div class="warning-content">
+
+                <h2>
+                    Threat Warning Active
+                </h2>
+
+                <p>
+                    This website has been flagged as potentially
+                    dangerous. The security warning is currently
+                    protecting this page.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- NORMAL STATUS -->
+
+        <section
+            id="safe-state"
+            class="safe-state"
+        >
+
+            <div class="status-icon">
+                ✓
+            </div>
+
+            <div>
+
+                <strong>
+                    Protection Active
+                </strong>
+
+                <span>
+                    Website monitoring is enabled
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <!-- ANALYSIS AREA -->
+
+        <section
+            id="analysis"
+            class="analysis hidden"
+        >
+
+            <div class="analysis-header">
+
+                <div>
+
+                    <span>
+                        SECURITY ANALYSIS
+                    </span>
+
+                    <h2 id="classification">
+                        -
+                    </h2>
+
+                </div>
+
+                <div
+                    id="risk-score"
+                    class="risk-score"
+                >
+                    0%
+                </div>
+
+            </div>
+
+
+            <!-- RISK -->
+
+            <div class="risk-progress">
+
+                <div
+                    id="risk-bar"
+                    class="risk-progress-fill"
+                ></div>
+
+            </div>
+
+
+            <!-- MODELS -->
+
+            <div class="section-title">
+                MODEL SIGNALS
+            </div>
+
+
+            <div class="model-grid">
+
+                <div class="model-card">
+
+                    <span>
+                        BERT
+                    </span>
+
+                    <strong id="email-score">
+                        0%
+                    </strong>
+
+                </div>
+
+
+                <div class="model-card">
+
+                    <span>
+                        CNN · URL
+                    </span>
+
+                    <strong id="url-score">
+                        0%
+                    </strong>
+
+                </div>
+
+
+                <div class="model-card">
+
+                    <span>
+                        BEHAVIOR
+                    </span>
+
+                    <strong id="behavior-score">
+                        0%
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- FUSION -->
+
+            <div class="fusion-card">
+
+                <div>
+
+                    <span>
+                        Fusion Score
+                    </span>
+
+                    <strong id="fusion-score">
+                        0%
+                    </strong>
+
+                </div>
+
+                <div>
+
+                    <span>
+                        Agreement
+                    </span>
+
+                    <strong id="agreement">
+                        -
+                    </strong>
+
+                </div>
+
+                <div>
+
+                    <span>
+                        Confidence
+                    </span>
+
+                    <strong id="confidence">
+                        0%
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- EXPLANATION -->
+
+            <div class="explanation">
+
+                <div class="section-title">
+                    WHY THIS RESULT?
+                </div>
+
+                <p id="summary">
+                    -
+                </p>
+
+                <div id="reasons"></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ANALYZE BUTTON -->
+
+        <button
+            id="analyze-btn"
+            class="analyze-btn"
+        >
+            Analyze Current Website
+        </button>
+
+
+        <!-- LOADING -->
+
+        <div
+            id="loading"
+            class="loading hidden"
+        >
+
+            <div class="spinner"></div>
+
+            <span>
+                Analyzing...
+            </span>
+
+        </div>
+
+
+        <!-- ERROR -->
+
+        <div
+            id="error"
+            class="error hidden"
+        ></div>
+
+
+        <!-- FOOTER -->
+
+        <footer>
+
+            <span>
+                Multi-Modal AI Protection
+            </span>
+
+            <span>
+                BERT · CNN · Isolation Forest
+            </span>
+
+        </footer>
+
+    </main>
+
+
+    <script src="popup.js"></script>
+
+</body>
+
+</html>

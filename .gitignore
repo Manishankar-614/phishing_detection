@@ -1,0 +1,142 @@
+# =========================================================
+# PHISHING DETECTION PROJECT - GITIGNORE
+# =========================================================
+
+# ---------------------------------------------------------
+# Python & Bytecode
+# ---------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.so
+
+# Python virtual environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+iceberg/
+
+# Python tooling, tests & cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.ipynb_checkpoints/
+
+# ---------------------------------------------------------
+# Datasets & Large Data Files
+# ---------------------------------------------------------
+backend/datasets/
+datasets/
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.parquet
+*.sqlite
+*.sqlite3
+*.db
+
+# ---------------------------------------------------------
+# ML Training Checkpoints & Intermediate Outputs
+# ---------------------------------------------------------
+checkpoints/
+**/checkpoints/
+runs/
+outputs/
+experiments/
+tensorboard/
+wandb/
+*.ckpt
+*.safetensors.tmp
+*.h5.tmp
+*.keras.tmp
+*.pkl.tmp
+*.joblib.tmp
+
+# ---------------------------------------------------------
+# Node / React / Vite / TypeScript
+# ---------------------------------------------------------
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+build/
+**/build/
+.vite/
+**/.vite/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+
+# ---------------------------------------------------------
+# Environment Variables & Secrets
+# ---------------------------------------------------------
+.env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
+!frontend/.env.example
+
+*.pem
+*.key
+*.crt
+*.cert
+
+# ---------------------------------------------------------
+# OS / Editor / IDE Artefacts
+# ---------------------------------------------------------
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+*.sublime-workspace
+*.sublime-project
+*.code-workspace
+.history/
+
+# ---------------------------------------------------------
+# Logs, Backups & Archives
+# ---------------------------------------------------------
+*.log
+logs/
+log/
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+*.old
+*.orig
+*.backup
+*.backup.*
+
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+# Deployment platforms
+.vercel/
+.netlify/
+.render/
