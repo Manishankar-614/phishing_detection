@@ -374,7 +374,7 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
         {/* =========================================================
             TACTICAL THREAT SONAR RADAR & NEURAL DEFENSE HEALTH
         ========================================================= */}
-        <section className="charts-grid">
+        <section className="radar-matrix-grid">
           {/* Tactical Radar Screen */}
           <div className="radar-creative-card">
             <div className="radar-header">
@@ -517,58 +517,94 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
               </div>
             </div>
 
-            <div className="matrix-nodes-grid">
-              {/* Node 1: BERT */}
-              <div className="neural-node">
-                <div className="node-header">
-                  <div className="node-title-group">
-                    <span className="node-led" />
-                    <span className="node-name">BERT NLP</span>
+            <div className="neural-engines-list">
+              {/* Engine 1: BERT NLP Core */}
+              <div className="neural-engine-card">
+                <div className="engine-card-header">
+                  <div className="engine-title-group">
+                    <span className="engine-led" />
+                    <span className="engine-title">BERT NLP Core</span>
+                    <span className="engine-badge badge-semantic">Semantic</span>
                   </div>
-                  <span className="source-tag tag-semantic">Semantic</span>
+                  <div className="engine-latency-tag">
+                    <span className="latency-dot" />
+                    <span>12.4 ms</span>
+                  </div>
                 </div>
                 <div className="neural-flow-indicator" />
-                <div className="node-specs-list">
-                  <div className="spec-line"><span className="spec-key">Architecture</span><span className="spec-val">12-L BERT</span></div>
-                  <div className="spec-line"><span className="spec-key">Attention</span><span className="spec-val">12 Heads</span></div>
-                  <div className="spec-line"><span className="spec-key">Inference</span><span className="spec-val text-green">12.4 ms</span></div>
-                  <div className="spec-line"><span className="spec-key">Domain</span><span className="spec-val text-cyan">Email Body</span></div>
+                <div className="engine-specs-row">
+                  <div className="spec-chip">
+                    <span className="chip-label">Architecture:</span>
+                    <span className="chip-value">12-Layer BERT</span>
+                  </div>
+                  <div className="spec-chip">
+                    <span className="chip-label">Attention Heads:</span>
+                    <span className="chip-value">12 Multi-Head</span>
+                  </div>
+                  <div className="spec-chip">
+                    <span className="chip-label">Inspection Target:</span>
+                    <span className="chip-value text-cyan">Email Body & Subject</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Node 2: Char-CNN */}
-              <div className="neural-node">
-                <div className="node-header">
-                  <div className="node-title-group">
-                    <span className="node-led" />
-                    <span className="node-name">Char-CNN</span>
+              {/* Engine 2: Char-CNN Engine */}
+              <div className="neural-engine-card">
+                <div className="engine-card-header">
+                  <div className="engine-title-group">
+                    <span className="engine-led" />
+                    <span className="engine-title">Char-CNN Engine</span>
+                    <span className="engine-badge badge-lexical">Lexical</span>
                   </div>
-                  <span className="source-tag tag-lexical">Lexical</span>
+                  <div className="engine-latency-tag">
+                    <span className="latency-dot" />
+                    <span>0.9 ms</span>
+                  </div>
                 </div>
                 <div className="neural-flow-indicator" />
-                <div className="node-specs-list">
-                  <div className="spec-line"><span className="spec-key">Conv Kernels</span><span className="spec-val">128 Filters</span></div>
-                  <div className="spec-line"><span className="spec-key">N-Gram Span</span><span className="spec-val">3, 4, 5-grams</span></div>
-                  <div className="spec-line"><span className="spec-key">Inference</span><span className="spec-val text-green">0.9 ms</span></div>
-                  <div className="spec-line"><span className="spec-key">Domain</span><span className="spec-val text-purple">URL Lexical</span></div>
+                <div className="engine-specs-row">
+                  <div className="spec-chip">
+                    <span className="chip-label">Conv Kernels:</span>
+                    <span className="chip-value">128 Filters</span>
+                  </div>
+                  <div className="spec-chip">
+                    <span className="chip-label">N-Gram Window:</span>
+                    <span className="chip-value">3, 4, 5-grams</span>
+                  </div>
+                  <div className="spec-chip">
+                    <span className="chip-label">Inspection Target:</span>
+                    <span className="chip-value text-purple">URL Homoglyphs & Tokens</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Node 3: Isolation Forest */}
-              <div className="neural-node">
-                <div className="node-header">
-                  <div className="node-title-group">
-                    <span className="node-led" />
-                    <span className="node-name">Isolation Forest</span>
+              {/* Engine 3: Isolation Forest */}
+              <div className="neural-engine-card">
+                <div className="engine-card-header">
+                  <div className="engine-title-group">
+                    <span className="engine-led" />
+                    <span className="engine-title">Isolation Forest</span>
+                    <span className="engine-badge badge-behavior">Behavioral</span>
                   </div>
-                  <span className="source-tag tag-behavior">Behavior</span>
+                  <div className="engine-latency-tag">
+                    <span className="latency-dot" />
+                    <span>0.4 ms</span>
+                  </div>
                 </div>
                 <div className="neural-flow-indicator" />
-                <div className="node-specs-list">
-                  <div className="spec-line"><span className="spec-key">Estimators</span><span className="spec-val">100 Trees</span></div>
-                  <div className="spec-line"><span className="spec-key">Contamination</span><span className="spec-val">0.04 Tuned</span></div>
-                  <div className="spec-line"><span className="spec-key">Inference</span><span className="spec-val text-green">0.4 ms</span></div>
-                  <div className="spec-line"><span className="spec-key">Domain</span><span className="spec-val text-emerald">DOM / Mouse</span></div>
+                <div className="engine-specs-row">
+                  <div className="spec-chip">
+                    <span className="chip-label">Estimators:</span>
+                    <span className="chip-value">100 Trees</span>
+                  </div>
+                  <div className="spec-chip">
+                    <span className="chip-label">Contamination:</span>
+                    <span className="chip-value">0.04 (Calibrated)</span>
+                  </div>
+                  <div className="spec-chip">
+                    <span className="chip-label">Inspection Target:</span>
+                    <span className="chip-value text-emerald">DOM & Mouse Dynamics</span>
+                  </div>
                 </div>
               </div>
             </div>
