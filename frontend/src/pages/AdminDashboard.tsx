@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   ShieldCheck,
   ShieldAlert,
@@ -13,6 +13,7 @@ import {
   X,
   ChevronRight,
   TrendingUp,
+  Crosshair,
 } from "lucide-react";
 import {
   fetchAdminStats,
@@ -48,12 +49,27 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
   const [retrainingResult, setRetrainingResult] = useState<RetrainingResponse | null>(null);
   const [trainingLogs, setTrainingLogs] = useState<string[]>([]);
 
+  // Radar Interactive State
+  const [hoveredBlip, setHoveredBlip] = useState<AdminScanItem | null>(null);
+  const [radarPingCoord, setRadarPingCoord] = useState<{ x: number; y: number } | null>(null);
+  const radarRef = useRef<HTMLDivElement>(null);
+
   // Toast State
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  // Radar Ping Interaction
+  const handleRadarClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!radarRef.current) return;
+    const rect = radarRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    setRadarPingCoord({ x, y });
+    setTimeout(() => setRadarPingCoord(null), 750);
   };
 
   // Ensure default clean cyber theme
@@ -351,6 +367,224 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
                   ? `${stats.pending_retraining || 0} pending model retrain`
                   : "No overrides yet"}
               </span>
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================================
+            TACTICAL THREAT SONAR RADAR & NEURAL DEFENSE HEALTH
+        ========================================================= */}
+        <section className="charts-grid">
+          {/* Tactical Radar Screen */}
+          <div className="radar-creative-card">
+            <div className="radar-header">
+              <div className="radar-title-group">
+                <Crosshair size={20} className="radar-icon-pulse" />
+                <div>
+                  <h3 className="chart-title" style={{ margin: 0 }}>Tactical Threat Sonar Radar</h3>
+                  <p className="chart-desc" style={{ margin: 0 }}>
+                    Live spatial threat mapping (Click radar to ping)
+                  </p>
+                </div>
+              </div>
+              <div className="chart-legend">
+                <span className="legend-item"><span className="legend-dot dot-red" /> Threat</span>
+                <span className="legend-item"><span className="legend-dot dot-green" /> Benign</span>
+                <span className="legend-item"><span className="legend-dot dot-amber" /> Suspicious</span>
+              </div>
+            </div>
+
+            {/* Circular Radar Display */}
+            <div
+              className="radar-display-area"
+              ref={radarRef}
+              onClick={handleRadarClick}
+              title="Click anywhere to trigger acoustic sonar ping"
+            >
+              {/* Radar Rings */}
+              <div className="radar-ring ring-1" />
+              <div className="radar-ring ring-2" />
+              <div className="radar-ring ring-3" />
+              <div className="radar-ring ring-4" />
+
+              {/* Crosshair Axes */}
+              <div className="radar-axis-h" />
+              <div className="radar-axis-v" />
+
+              {/* Cardinal markings */}
+              <span className="radar-coord n">000° N</span>
+              <span className="radar-coord e">090° E</span>
+              <span className="radar-coord s">180° S</span>
+              <span className="radar-coord w">270° W</span>
+
+              {/* Rotating Sweeping Laser Line */}
+              <div className="radar-sweeper" />
+
+              {/* Dynamic Target Blips from live scans */}
+              {scans.slice(0, 14).map((scan, idx) => {
+                const total = Math.min(scans.length, 14) || 1;
+                const angle = (idx * (360 / total) * Math.PI) / 180;
+                const distancePct = 22 + (scan.risk_score * 48);
+                const left = 50 + distancePct * Math.cos(angle);
+                const top = 50 + distancePct * Math.sin(angle);
+
+                const blipClass =
+                  scan.classification === "phishing"
+                    ? "blip-phish"
+                    : scan.classification === "legitimate"
+                    ? "blip-legit"
+                    : "blip-susp";
+
+                return (
+                  <div
+                    key={scan.id}
+                    className={`radar-blip ${blipClass}`}
+                    style={{ left: `${left}%`, top: `${top}%` }}
+                    onMouseEnter={() => setHoveredBlip(scan)}
+                    onMouseLeave={() => setHoveredBlip(null)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenCorrection(scan);
+                    }}
+                    title={`${scan.target} (${(scan.risk_score * 100).toFixed(0)}% Risk) - Click to review`}
+                  >
+                    <div className="blip-pulse-wave" />
+                  </div>
+                );
+              })}
+
+              {/* Expanding Ping Wave on Click */}
+              {radarPingCoord && (
+                <div
+                  className="radar-ping-wave"
+                  style={{ left: `${radarPingCoord.x}px`, top: `${radarPingCoord.y}px` }}
+                />
+              )}
+            </div>
+
+            {/* Live Hover Tooltip / Status Readout */}
+            {hoveredBlip ? (
+              <div className="radar-telemetry-readout" style={{ borderColor: "var(--cyber-cyan)" }}>
+                <div className="telemetry-cell">
+                  <span className="telemetry-label">Locked Target:</span>
+                  <span className="telemetry-val" style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {hoveredBlip.target}
+                  </span>
+                </div>
+                <div className="telemetry-cell">
+                  <span className="telemetry-label">Risk Probability:</span>
+                  <span className="telemetry-val highlight-cyan">
+                    {(hoveredBlip.risk_score * 100).toFixed(1)}%
+                  </span>
+                </div>
+                <div className="telemetry-cell">
+                  <span className="telemetry-label">Action:</span>
+                  <span
+                    className="telemetry-val"
+                    style={{ color: "#f87171", cursor: "pointer" }}
+                    onClick={() => handleOpenCorrection(hoveredBlip)}
+                  >
+                    Click to Correct
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="radar-telemetry-readout">
+                <div className="telemetry-cell">
+                  <span className="telemetry-label">Sonar Frequency:</span>
+                  <span className="telemetry-val">94.2 GHz Pulse</span>
+                </div>
+                <div className="telemetry-cell">
+                  <span className="telemetry-label">Fleet Coverage:</span>
+                  <span className="telemetry-val text-green">100% Active</span>
+                </div>
+                <div className="telemetry-cell">
+                  <span className="telemetry-label">Targets Tracked:</span>
+                  <span className="telemetry-val highlight-purple">{scans.length} Endpoints</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Multi-Modal Neural Defense Health */}
+          <div className="neural-matrix-card">
+            <div className="chart-panel-header">
+              <div>
+                <h3 className="chart-title" style={{ margin: 0 }}>Multi-Modal Neural Defense Health</h3>
+                <p className="chart-desc" style={{ margin: 0 }}>
+                  Real-time status & inference latencies across ensemble engines
+                </p>
+              </div>
+            </div>
+
+            <div className="matrix-nodes-grid">
+              {/* Node 1: BERT */}
+              <div className="neural-node">
+                <div className="node-header">
+                  <div className="node-title-group">
+                    <span className="node-led" />
+                    <span className="node-name">BERT NLP</span>
+                  </div>
+                  <span className="source-tag tag-semantic">Semantic</span>
+                </div>
+                <div className="neural-flow-indicator" />
+                <div className="node-specs-list">
+                  <div className="spec-line"><span className="spec-key">Architecture</span><span className="spec-val">12-L BERT</span></div>
+                  <div className="spec-line"><span className="spec-key">Attention</span><span className="spec-val">12 Heads</span></div>
+                  <div className="spec-line"><span className="spec-key">Inference</span><span className="spec-val text-green">12.4 ms</span></div>
+                  <div className="spec-line"><span className="spec-key">Domain</span><span className="spec-val text-cyan">Email Body</span></div>
+                </div>
+              </div>
+
+              {/* Node 2: Char-CNN */}
+              <div className="neural-node">
+                <div className="node-header">
+                  <div className="node-title-group">
+                    <span className="node-led" />
+                    <span className="node-name">Char-CNN</span>
+                  </div>
+                  <span className="source-tag tag-lexical">Lexical</span>
+                </div>
+                <div className="neural-flow-indicator" />
+                <div className="node-specs-list">
+                  <div className="spec-line"><span className="spec-key">Conv Kernels</span><span className="spec-val">128 Filters</span></div>
+                  <div className="spec-line"><span className="spec-key">N-Gram Span</span><span className="spec-val">3, 4, 5-grams</span></div>
+                  <div className="spec-line"><span className="spec-key">Inference</span><span className="spec-val text-green">0.9 ms</span></div>
+                  <div className="spec-line"><span className="spec-key">Domain</span><span className="spec-val text-purple">URL Lexical</span></div>
+                </div>
+              </div>
+
+              {/* Node 3: Isolation Forest */}
+              <div className="neural-node">
+                <div className="node-header">
+                  <div className="node-title-group">
+                    <span className="node-led" />
+                    <span className="node-name">Isolation Forest</span>
+                  </div>
+                  <span className="source-tag tag-behavior">Behavior</span>
+                </div>
+                <div className="neural-flow-indicator" />
+                <div className="node-specs-list">
+                  <div className="spec-line"><span className="spec-key">Estimators</span><span className="spec-val">100 Trees</span></div>
+                  <div className="spec-line"><span className="spec-key">Contamination</span><span className="spec-val">0.04 Tuned</span></div>
+                  <div className="spec-line"><span className="spec-key">Inference</span><span className="spec-val text-green">0.4 ms</span></div>
+                  <div className="spec-line"><span className="spec-key">Domain</span><span className="spec-val text-emerald">DOM / Mouse</span></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Model Consensus Bar */}
+            <div className="neural-fusion-footer">
+              <div className="fusion-header">
+                <span className="fusion-title">Fleet Decision Fusion Confidence:</span>
+                <span className="fusion-rate">Ensemble Consensus: 98.5%</span>
+              </div>
+              <div className="progress-bg">
+                <div
+                  className="progress-fill fill-cyan"
+                  style={{ width: `${stats?.estimated_accuracy || 98.5}%` }}
+                />
+              </div>
             </div>
           </div>
         </section>

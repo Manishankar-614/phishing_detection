@@ -2271,6 +2271,375 @@ body {
 .btn-done:hover:not(:disabled) { background: #059669; }
 .btn-done:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* ============================================================
+   TACTICAL THREAT SONAR RADAR & NEURAL DEFENSE MATRIX
+   ============================================================ */
+:root {
+  --radar-color: #06b6d4;
+  --radar-sweep: rgba(6, 182, 212, 0.35);
+  --radar-grid: rgba(6, 182, 212, 0.22);
+}
+
+.radar-creative-card {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+
+.radar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.radar-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.radar-icon-pulse {
+  color: var(--radar-color);
+  animation: radarIconGlow 2s infinite ease-in-out;
+}
+
+@keyframes radarIconGlow {
+  0%, 100% { filter: drop-shadow(0 0 4px var(--radar-color)); opacity: 1; }
+  50% { filter: drop-shadow(0 0 12px var(--radar-color)); opacity: 0.7; }
+}
+
+.radar-display-area {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-width: 330px;
+  margin: 0 auto;
+  border-radius: 50%;
+  border: 2px solid var(--radar-grid);
+  background: radial-gradient(circle, rgba(2, 6, 23, 0.85) 0%, rgba(10, 15, 30, 0.98) 100%);
+  overflow: hidden;
+  cursor: crosshair;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.9), 0 0 25px rgba(6, 182, 212, 0.12);
+}
+
+/* Concentric range rings */
+.radar-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px dashed var(--radar-grid);
+  pointer-events: none;
+}
+.radar-ring.ring-1 { width: 28%; height: 28%; }
+.radar-ring.ring-2 { width: 54%; height: 54%; }
+.radar-ring.ring-3 { width: 80%; height: 80%; }
+.radar-ring.ring-4 { width: 98%; height: 98%; border-style: solid; border-color: var(--radar-color); opacity: 0.4; }
+
+/* Radar crosshairs */
+.radar-axis-h {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--radar-grid);
+  pointer-events: none;
+}
+.radar-axis-v {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 100%;
+  background: var(--radar-grid);
+  pointer-events: none;
+}
+
+/* Sweeping laser line */
+.radar-sweeper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0deg, transparent 290deg, var(--radar-sweep) 350deg, var(--radar-color) 360deg);
+  animation: radarSweep 3.6s linear infinite;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+@keyframes radarSweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Interactive Blips */
+.radar-blip {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  z-index: 10;
+}
+.radar-blip:hover {
+  transform: translate(-50%, -50%) scale(1.6);
+  z-index: 20;
+}
+
+.radar-blip.blip-phish {
+  background: #ef4444;
+  box-shadow: 0 0 10px #ef4444, 0 0 20px #ef4444;
+}
+.radar-blip.blip-legit {
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981, 0 0 20px #10b981;
+}
+.radar-blip.blip-susp {
+  background: #f59e0b;
+  box-shadow: 0 0 10px #f59e0b, 0 0 20px #f59e0b;
+}
+
+.blip-pulse-wave {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  animation: blipPulse 1.8s infinite;
+  pointer-events: none;
+}
+
+@keyframes blipPulse {
+  0% { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* Expanding Ping Wave on Click */
+.radar-ping-wave {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid var(--radar-color);
+  transform: translate(-50%, -50%);
+  animation: pingWaveExpand 0.75s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes pingWaveExpand {
+  0% { width: 0px; height: 0px; opacity: 1; }
+  100% { width: 220px; height: 220px; opacity: 0; }
+}
+
+/* Radar Degrees & Cardinal Marks */
+.radar-coord {
+  position: absolute;
+  font-size: 9px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  font-weight: 700;
+  pointer-events: none;
+}
+.radar-coord.n { top: 6px; left: 50%; transform: translateX(-50%); }
+.radar-coord.s { bottom: 6px; left: 50%; transform: translateX(-50%); }
+.radar-coord.e { right: 8px; top: 50%; transform: translateY(-50%); }
+.radar-coord.w { left: 8px; top: 50%; transform: translateY(-50%); }
+
+.radar-telemetry-readout {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  background: rgba(2, 6, 23, 0.7);
+  border: 1px solid var(--border-color);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.telemetry-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.telemetry-label { color: var(--text-muted); font-size: 10px; }
+.telemetry-val { font-weight: 700; color: var(--text-primary); }
+
+/* ============================================================
+   MULTI-MODAL NEURAL DEFENSE HEALTH MATRIX
+   ============================================================ */
+.neural-matrix-card {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.matrix-nodes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.neural-node {
+  background: rgba(2, 6, 23, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.neural-node:hover {
+  border-color: rgba(14, 165, 233, 0.4);
+  background: rgba(2, 6, 23, 0.85);
+  transform: translateY(-2px);
+}
+
+.node-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.node-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  color: #f8fafc;
+}
+
+.node-name {
+  white-space: nowrap;
+}
+
+.node-led {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.tag-semantic {
+  color: #38bdf8 !important;
+  background: rgba(56, 189, 248, 0.12) !important;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  font-size: 11px;
+}
+
+.tag-lexical {
+  color: #c084fc !important;
+  background: rgba(192, 132, 252, 0.12) !important;
+  border: 1px solid rgba(192, 132, 252, 0.25);
+  font-size: 11px;
+}
+
+.tag-behavior {
+  color: #34d399 !important;
+  background: rgba(52, 211, 153, 0.12) !important;
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  font-size: 11px;
+}
+
+.neural-flow-indicator {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #0ea5e9, transparent);
+  border-radius: 2px;
+  animation: neuralFlow 1.8s infinite linear;
+}
+
+@keyframes neuralFlow {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.node-specs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.spec-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.spec-key {
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.spec-val {
+  color: #f1f5f9;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  text-align: right;
+}
+
+.neural-fusion-footer {
+  margin-top: 6px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fusion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.fusion-title {
+  color: var(--text-secondary);
+}
+
+.fusion-rate {
+  color: var(--cyber-cyan);
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 1200px) {
   .kpi-grid {
