@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import {
   ShieldCheck,
   ShieldAlert,
@@ -33,6 +33,7 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
   // Telemetry Data State
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [scans, setScans] = useState<AdminScanItem[]>([]);
+  const [allScans, setAllScans] = useState<AdminScanItem[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [filterType, setFilterType] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -84,18 +85,38 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
   const loadData = async () => {
     try {
       setRefreshing(true);
-      const [statsData, scansData] = await Promise.all([
+      const [statsData, scansData, allScansData] = await Promise.all([
         fetchAdminStats(),
         fetchAdminScans({ filter: filterType, search: searchTerm, limit: 100 }),
+        fetchAdminScans({ filter: "all", search: "", limit: 100 }),
       ]);
       setStats(statsData);
       setScans(scansData.scans);
+      setAllScans(allScansData.scans);
     } catch (err) {
       console.error("Failed to load admin telemetry:", err);
     } finally {
       setRefreshing(false);
     }
   };
+
+  // Sample real active threat targets across ALL categories for the Sonar Radar
+  const radarTargets = useMemo(() => {
+    const pool = allScans.length > 0 ? allScans : scans;
+    const phish = pool.filter((s) => s.classification === "phishing");
+    const susp = pool.filter((s) => s.classification === "suspicious");
+    const legit = pool.filter((s) => s.classification === "legitimate");
+
+    // Gather real endpoints:
+    // - High-risk phishing attacks (Outer perimeter, Red)
+    // - Suspicious traffic (Mid warning ring, Amber)
+    // - Benign verified services (Inner core ring, Green)
+    return [
+      ...phish.slice(0, 6),
+      ...susp.slice(0, 4),
+      ...legit.slice(0, 5),
+    ];
+  }, [allScans, scans]);
 
   useEffect(() => {
     loadData();
@@ -420,11 +441,15 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
               {/* Rotating Sweeping Laser Line */}
               <div className="radar-sweeper" />
 
-              {/* Dynamic Target Blips from live scans */}
-              {scans.slice(0, 14).map((scan, idx) => {
-                const total = Math.min(scans.length, 14) || 1;
+              {/* Dynamic Target Blips across Phishing (Red), Suspicious (Amber), and Benign (Green) */}
+              {radarTargets.map((scan, idx) => {
+                const total = radarTargets.length || 1;
                 const angle = (idx * (360 / total) * Math.PI) / 180;
-                const distancePct = 22 + (scan.risk_score * 48);
+                // Radial distance directly maps risk score:
+                // Low risk benign (0.05-0.28) -> ~22% to 35% from center (Inner Core)
+                // Medium risk suspicious (0.45-0.60) -> ~45% to 54% from center (Mid Ring)
+                // High risk phishing (0.85-0.98) -> ~68% to 76% from center (Outer Perimeter)
+                const distancePct = 20 + (scan.risk_score * 56);
                 const left = 50 + distancePct * Math.cos(angle);
                 const top = 50 + distancePct * Math.sin(angle);
 
