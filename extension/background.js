@@ -1,5 +1,17 @@
-const API_URL =
+const DEFAULT_REMOTE_API =
+    "https://alternatively-roommates-recall-sur.trycloudflare.com/api";
+const LOCAL_API =
     "http://127.0.0.1:5000/api";
+
+async function getApiBaseUrl() {
+    try {
+        const stored = await chrome.storage.local.get("custom_api_url");
+        if (stored && stored.custom_api_url && typeof stored.custom_api_url === "string" && stored.custom_api_url.trim()) {
+            return stored.custom_api_url.trim().replace(/\/+$/, "");
+        }
+    } catch (e) {}
+    return DEFAULT_REMOTE_API;
+}
 
 
 // ============================================================
@@ -673,49 +685,42 @@ async function analyzePage(
     // ========================================================
 
     let response;
-
+    const baseApi = await getApiBaseUrl();
 
     try {
-
-        response =
-            await fetch(
-
-                `${API_URL}/analyze`,
-
-                {
-
-                    method:
-                        "POST",
-
-                    headers: {
-
-                        "Content-Type":
-                            "application/json",
-
-                        "Accept":
-                            "application/json"
-
-                    },
-
-                    body:
-                        JSON.stringify(
-                            payload
-                        )
-
-                }
-
-            );
-
-    }
-
-    catch (error) {
-
-        throw new Error(
-
-            "Unable to connect to Flask API. " +
-            "Make sure the backend is running."
-
+        response = await fetch(
+            `${baseApi}/analyze`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify(payload)
+            }
         );
+    } catch (error) {
+        if (baseApi !== LOCAL_API) {
+            console.warn("Primary API endpoint unreachable, attempting fallback to local API...");
+            try {
+                response = await fetch(
+                    `${LOCAL_API}/analyze`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Accept": "application/json"
+                        },
+                        body: JSON.stringify(payload)
+                    }
+                );
+            } catch (fallbackError) {
+                throw new Error("Unable to connect to PhishGuard AI API (cloud and local both unreachable). Please ensure the backend server or tunnel is running.");
+            }
+        } else {
+            throw new Error("Unable to connect to Flask API. " + error.message);
+        }
+    }
 
     }
 
