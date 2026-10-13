@@ -9,21 +9,5 @@
     "url_weight": 0.4,
     "behavior_weight": 0.05
   },
-  "retraining_history": [
-    {
-      "retraining_id": "637af451",
-      "timestamp": "2026-10-13T10:15:33.554542",
-      "samples_processed": 1,
-      "loss_before": 0.048,
-      "loss_after": 0.0182,
-      "loss_reduction_percent": "62.1%",
-      "accuracy_improvement": "+0.40%",
-      "previous_version": "v2.1-calibrated",
-      "new_version": "v2.2-adaptive",
-      "epochs": 3,
-      "batch_size": 16,
-      "optimizer": "AdamW (lr=2e-5, weight_decay=0.01)",
-      "status": "CONVERGED_SUCCESSFULLY"
-    }
-  ]
+  "retraining_history": []
 }

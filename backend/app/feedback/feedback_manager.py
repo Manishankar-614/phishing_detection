@@ -73,10 +73,7 @@ class FeedbackManager:
             # Suspicious Samples (Review Needed)
             {"url": "https://auth-staging.internal-corp.dev/oauth", "email": "", "classification": "suspicious", "risk_level": "medium", "risk_score": 0.52, "email_score": 0.0, "url_score": 0.48, "behavior_score": 0.55, "source": "Browser Extension Hook"},
             {"url": "https://newsletter-tracking.mailchimp-cdn.net/track?utm=special_deal", "email": "Check out our weekly engineering newsletter and product updates.", "classification": "suspicious", "risk_level": "medium", "risk_score": 0.48, "email_score": 0.35, "url_score": 0.54, "behavior_score": 0.40, "source": "Email Add-in Hook"},
-            {"url": "http://vpn-portal-auth.internal-gateway.net:8443", "email": "", "classification": "suspicious", "risk_level": "medium", "risk_score": 0.58, "email_score": 0.0, "url_score": 0.56, "behavior_score": 0.62, "source": "Browser Extension Hook"},
-
-            # Previously corrected by human admin (Active Learning exemplar)
-            {"url": "https://intranet-billing.gat.ac.in/portal", "email": "Important notice regarding semester examination fees payment deadline.", "classification": "legitimate", "risk_level": "low", "risk_score": 0.18, "email_score": 0.15, "url_score": 0.12, "behavior_score": 0.25, "source": "Browser Extension Hook", "corrected": True, "correction_reason": "Verified official university intranet fee portal"}
+            {"url": "http://vpn-portal-auth.internal-gateway.net:8443", "email": "", "classification": "suspicious", "risk_level": "medium", "risk_score": 0.58, "email_score": 0.0, "url_score": 0.56, "behavior_score": 0.62, "source": "Browser Extension Hook"}
         ]
 
         history = []

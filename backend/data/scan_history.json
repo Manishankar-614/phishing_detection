@@ -1,5 +1,85 @@
 [
   {
+    "id": "cf73706e-a251-4dc6-9d7e-39285f023f6d",
+    "timestamp": "2026-10-13T10:54:25.142235",
+    "url": "https://github.com/Colour-plus/Lead_Engine",
+    "email": "",
+    "target": "https://github.com/Colour-plus/Lead_Engine",
+    "classification": "legitimate",
+    "risk_level": "low",
+    "risk_score": 0.2602,
+    "risk_percentage": 26.02,
+    "email_score": 0.0,
+    "url_score": 0.2,
+    "behavior_score": 0.6011,
+    "source": "Web Portal & Extension Hook",
+    "feedback": null
+  },
+  {
+    "id": "76111dd3-bf2c-4cd1-925c-1df4d1418ee5",
+    "timestamp": "2026-10-13T10:54:13.808643",
+    "url": "https://github.com/Colour-plus/Lead_Engine",
+    "email": "",
+    "target": "https://github.com/Colour-plus/Lead_Engine",
+    "classification": "legitimate",
+    "risk_level": "low",
+    "risk_score": 0.2831,
+    "risk_percentage": 28.31,
+    "email_score": 0.0,
+    "url_score": 0.2,
+    "behavior_score": 0.7543,
+    "source": "Web Portal & Extension Hook",
+    "feedback": null
+  },
+  {
+    "id": "49f3c38b-c56e-46d4-961a-7034dfad44db",
+    "timestamp": "2026-10-13T10:54:01.958712",
+    "url": "https://github.com/Colour-plus/Lead_Engine",
+    "email": "",
+    "target": "https://github.com/Colour-plus/Lead_Engine",
+    "classification": "legitimate",
+    "risk_level": "low",
+    "risk_score": 0.2602,
+    "risk_percentage": 26.02,
+    "email_score": 0.0,
+    "url_score": 0.2,
+    "behavior_score": 0.6011,
+    "source": "Web Portal & Extension Hook",
+    "feedback": null
+  },
+  {
+    "id": "29d62de8-6775-4ab1-89a4-492f850aaba6",
+    "timestamp": "2026-10-13T10:53:34.783244",
+    "url": "https://secure-login-appleid-verify.com",
+    "email": "",
+    "target": "https://secure-login-appleid-verify.com",
+    "classification": "phishing",
+    "risk_level": "critical",
+    "risk_score": 0.88,
+    "risk_percentage": 88.0,
+    "email_score": 0.0,
+    "url_score": 0.88,
+    "behavior_score": 0.6011,
+    "source": "Web Portal & Extension Hook",
+    "feedback": null
+  },
+  {
+    "id": "c7e3b87b-8912-4ac0-ba8e-a159b893102f",
+    "timestamp": "2026-10-13T10:52:06.100773",
+    "url": "https://secure-login-appleid-verify.com",
+    "email": "",
+    "target": "https://secure-login-appleid-verify.com",
+    "classification": "phishing",
+    "risk_level": "critical",
+    "risk_score": 0.88,
+    "risk_percentage": 88.0,
+    "email_score": 0.0,
+    "url_score": 0.88,
+    "behavior_score": 0.6011,
+    "source": "Web Portal & Extension Hook",
+    "feedback": null
+  },
+  {
     "id": "eb4711e9-76d6-4b24-851d-421e7bb6fdb0",
     "timestamp": "2026-10-13T10:35:52.727532",
     "url": "http://localhost:5173/?view=admin",
@@ -349,12 +429,6 @@
     "url_score": 0.12,
     "behavior_score": 0.25,
     "source": "Browser Extension Hook",
-    "feedback": {
-      "corrected_label": "legitimate",
-      "original_label": "suspicious",
-      "reason": "Verified official university intranet fee portal",
-      "corrected_at": "2026-10-13T02:44:02.232331",
-      "retrained": true
-    }
+    "feedback": null
   }
 ]
