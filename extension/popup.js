@@ -769,7 +769,23 @@ chrome.storage.onChanged.addListener(
 
 
 // ============================================================
-// START
+// START & ADMIN NAVIGATION
 // ============================================================
+
+const adminDashboardBtn =
+    document.getElementById(
+        "admin-dashboard-btn"
+    );
+
+if (adminDashboardBtn) {
+    adminDashboardBtn.addEventListener(
+        "click",
+        () => {
+            chrome.tabs.create({
+                url: "http://localhost:5173/?view=admin"
+            });
+        }
+    );
+}
 
 initialize();
