@@ -107,15 +107,20 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
     const susp = pool.filter((s) => s.classification === "suspicious");
     const legit = pool.filter((s) => s.classification === "legitimate");
 
-    // Gather real endpoints:
-    // - High-risk phishing attacks (Outer perimeter, Red)
-    // - Suspicious traffic (Mid warning ring, Amber)
-    // - Benign verified services (Inner core ring, Green)
-    return [
-      ...phish.slice(0, 6),
-      ...susp.slice(0, 4),
-      ...legit.slice(0, 5),
-    ];
+    const pList = phish.slice(0, 4);
+    const sList = susp.slice(0, 3);
+    const lList = legit.slice(0, 5);
+
+    // Interleave so threats (red), warnings (amber), and safe (green) endpoints
+    // are balanced evenly all around the 360-degree radar clock without bunching
+    const interleaved: AdminScanItem[] = [];
+    const maxLen = Math.max(pList.length, sList.length, lList.length);
+    for (let i = 0; i < maxLen; i++) {
+      if (i < pList.length) interleaved.push(pList[i]);
+      if (i < lList.length) interleaved.push(lList[i]);
+      if (i < sList.length) interleaved.push(sList[i]);
+    }
+    return interleaved;
   }, [allScans, scans]);
 
   useEffect(() => {
@@ -420,7 +425,6 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
               className="radar-display-area"
               ref={radarRef}
               onClick={handleRadarClick}
-              title="Click anywhere to trigger acoustic sonar ping"
             >
               {/* Radar Rings */}
               <div className="radar-ring ring-1" />
@@ -444,14 +448,17 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
               {/* Dynamic Target Blips across Phishing (Red), Suspicious (Amber), and Benign (Green) */}
               {radarTargets.map((scan, idx) => {
                 const total = radarTargets.length || 1;
-                const angle = (idx * (360 / total) * Math.PI) / 180;
-                // Radial distance directly maps risk score:
-                // Low risk benign (0.05-0.28) -> ~22% to 35% from center (Inner Core)
-                // Medium risk suspicious (0.45-0.60) -> ~45% to 54% from center (Mid Ring)
-                // High risk phishing (0.85-0.98) -> ~68% to 76% from center (Outer Perimeter)
-                const distancePct = 20 + (scan.risk_score * 56);
-                const left = 50 + distancePct * Math.cos(angle);
-                const top = 50 + distancePct * Math.sin(angle);
+                // Distribute angles evenly around 360 clock, starting from top (-90 deg)
+                const angleDeg = (idx * (360 / total)) - 90;
+                const angleRad = (angleDeg * Math.PI) / 180;
+
+                // Scale radial distance safely within the circular container (max radius 41%):
+                // - Low risk benign (0.05-0.28): 15% to 22% radius (Inner Core Zone)
+                // - Medium risk suspicious (0.45-0.60): 27% to 32% radius (Warning Ring Zone)
+                // - High risk phishing (0.85-0.98): 37% to 41% radius (Outer Perimeter Zone)
+                const radiusPct = 14 + (scan.risk_score * 27);
+                const left = 50 + radiusPct * Math.cos(angleRad);
+                const top = 50 + radiusPct * Math.sin(angleRad);
 
                 const blipClass =
                   scan.classification === "phishing"
