@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 
 from app.predictors.master_predictor import analyze_input
+from app.feedback.feedback_manager import feedback_manager
 
 
 api = Blueprint(
@@ -159,6 +160,19 @@ def analyze():
 
 
         # ========================================================
+        # RECORD SCAN IN EXTENSION HISTORY
+        # ========================================================
+        try:
+            feedback_manager.record_scan(
+                email_text=email_text,
+                url=url,
+                result=result,
+                source="Web Portal & Extension Hook"
+            )
+        except Exception as record_err:
+            print(f"Warning: could not record scan in history: {record_err}")
+
+        # ========================================================
         # RESPONSE
         # ========================================================
 
@@ -196,3 +210,92 @@ def analyze():
             "message": "Internal prediction error."
 
         }), 500
+
+
+# ============================================================
+# EXTENSION ADMIN CONTROL PANEL ENDPOINTS
+# ============================================================
+
+@api.route("/admin/stats", methods=["GET"])
+def get_admin_stats():
+    """Returns real-time aggregate statistics for the extension control panel."""
+    try:
+        stats = feedback_manager.get_stats()
+        return jsonify({
+            "status": "success",
+            "stats": stats
+        })
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Failed to retrieve stats: {str(e)}"
+        }), 500
+
+
+@api.route("/admin/scans", methods=["GET"])
+def get_admin_scans():
+    """Returns filtered, searchable scan logs for the extension control panel."""
+    try:
+        filter_type = request.args.get("filter", "all")
+        search = request.args.get("search", "")
+        limit = int(request.args.get("limit", 50))
+        offset = int(request.args.get("offset", 0))
+
+        data = feedback_manager.get_scans(
+            filter_type=filter_type,
+            search=search,
+            limit=limit,
+            offset=offset
+        )
+        return jsonify({
+            "status": "success",
+            "data": data
+        })
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Failed to retrieve scans: {str(e)}"
+        }), 500
+
+
+@api.route("/admin/correct", methods=["POST"])
+def submit_admin_correction():
+    """Submits human-in-the-loop correction and updates active calibration."""
+    try:
+        data = request.get_json(silent=True) or {}
+        scan_id = data.get("scan_id", "")
+        corrected_label = data.get("corrected_label", "").lower().strip()
+        reason = data.get("reason", "")
+        admin_name = data.get("admin", "Administrator")
+
+        if corrected_label not in ("legitimate", "phishing"):
+            return jsonify({
+                "status": "error",
+                "message": "corrected_label must be either 'legitimate' or 'phishing'."
+            }), 400
+
+        result = feedback_manager.submit_correction(
+            scan_id=scan_id,
+            corrected_label=corrected_label,
+            reason=reason,
+            admin_name=admin_name
+        )
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Failed to submit correction: {str(e)}"
+        }), 500
+
+
+@api.route("/admin/retrain", methods=["POST"])
+def trigger_admin_retrain():
+    """Triggers adaptive self-retraining cycle over all feedback samples."""
+    try:
+        result = feedback_manager.trigger_retraining()
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Failed to execute retraining: {str(e)}"
+        }), 500

@@ -147,6 +147,87 @@ apiClient.interceptors.response.use(
   }
 );
 
+export interface AdminStats {
+  total_scans: number;
+  phishing_blocked: number;
+  legitimate_allowed: number;
+  suspicious_flagged: number;
+  admin_corrections: number;
+  pending_retraining: number;
+  estimated_accuracy: number;
+  model_version: string;
+  last_retrained: string;
+  total_retrained_samples: number;
+  timeline_trends: Array<{
+    date: string;
+    legitimate: number;
+    phishing: number;
+    suspicious: number;
+    total: number;
+  }>;
+  risk_bands: {
+    low_0_35: number;
+    med_35_65: number;
+    high_65_100: number;
+  };
+  average_scores: {
+    bert_email: number;
+    cnn_url: number;
+    isolation_forest_behavior: number;
+  };
+}
+
+export interface AdminScanItem {
+  id: string;
+  timestamp: string;
+  url: string;
+  email: string;
+  target: string;
+  classification: "legitimate" | "phishing" | "suspicious" | string;
+  risk_level: string;
+  risk_score: number;
+  risk_percentage: number;
+  email_score: number;
+  url_score: number;
+  behavior_score: number;
+  source: string;
+  feedback?: {
+    original_label: string;
+    corrected_label: string;
+    reason: string;
+    admin: string;
+    corrected_at: string;
+    retrained: boolean;
+  } | null;
+}
+
+export interface RetrainingLog {
+  retraining_id: string;
+  timestamp: string;
+  samples_processed: number;
+  loss_before: number;
+  loss_after: number;
+  loss_reduction_percent: string;
+  accuracy_improvement: string;
+  previous_version: string;
+  new_version: string;
+  epochs: number;
+  batch_size: number;
+  optimizer: string;
+  status: string;
+}
+
+export interface RetrainingResponse {
+  status: string;
+  message: string;
+  retraining_log: RetrainingLog;
+  updated_calibration: {
+    version: string;
+    last_retrained: string;
+    total_retrained_samples: number;
+  };
+}
+
 // ----------------------------------------------------------------------
 // 5. SERVICE METHODS
 // ----------------------------------------------------------------------
@@ -166,6 +247,42 @@ export const checkApiHealth = async (
   config?: AxiosRequestConfig
 ): Promise<HealthCheckResponse> => {
   const response = await apiClient.get<HealthCheckResponse>("/health", config);
+  return response.data;
+};
+
+export const fetchAdminStats = async (): Promise<AdminStats> => {
+  const response = await apiClient.get<{ status: string; stats: AdminStats }>("/admin/stats");
+  return response.data.stats;
+};
+
+export const fetchAdminScans = async (params?: {
+  filter?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<{ total: number; scans: AdminScanItem[] }> => {
+  const response = await apiClient.get<{ status: string; data: { total: number; scans: AdminScanItem[] } }>(
+    "/admin/scans",
+    { params }
+  );
+  return response.data.data;
+};
+
+export const submitCorrection = async (payload: {
+  scan_id: string;
+  corrected_label: "legitimate" | "phishing";
+  reason?: string;
+  admin?: string;
+}): Promise<{ status: string; message: string }> => {
+  const response = await apiClient.post<{ status: string; message: string }>(
+    "/admin/correct",
+    payload
+  );
+  return response.data;
+};
+
+export const triggerRetraining = async (): Promise<RetrainingResponse> => {
+  const response = await apiClient.post<RetrainingResponse>("/admin/retrain");
   return response.data;
 };
 

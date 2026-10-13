@@ -45,6 +45,8 @@ from app.explainability.explainability_engine import (
     generate_explanation
 )
 
+from app.feedback.feedback_manager import feedback_manager
+
 
 # ============================================================
 # SAFE SCORE
@@ -1342,6 +1344,21 @@ def analyze_input(
             fusion_result
         )
 
+        # ----------------------------------------------------
+        # ACTIVE LEARNING & HUMAN-IN-THE-LOOP FEEDBACK OVERRIDE
+        # ----------------------------------------------------
+        exemplar_override = feedback_manager.check_exemplar_override(url=url, email_text=email_text)
+        if exemplar_override:
+            target_class = exemplar_override.get("classification", "legitimate")
+            target_score = float(exemplar_override.get("target_score", 0.05 if target_class == "legitimate" else 0.95))
+            fusion_result["fused_score"] = target_score
+            risk_result["risk_score"] = target_score
+            risk_result["risk_percentage"] = round(target_score * 100, 2)
+            risk_result["risk_level"] = "low" if target_class == "legitimate" else "critical"
+            risk_result["classification"] = target_class
+            risk_result["active_learning_override"] = True
+            risk_result["override_reason"] = exemplar_override.get("reason", "Admin active learning exemplar")
+
 
         # ----------------------------------------------------
         # URL FEATURES
@@ -1666,6 +1683,21 @@ def analyze_input(
     risk_result = analyze_risk(
         fusion_result
     )
+
+    # --------------------------------------------------------
+    # ACTIVE LEARNING & HUMAN-IN-THE-LOOP FEEDBACK OVERRIDE
+    # --------------------------------------------------------
+    exemplar_override = feedback_manager.check_exemplar_override(url=url, email_text="")
+    if exemplar_override:
+        target_class = exemplar_override.get("classification", "legitimate")
+        target_score = float(exemplar_override.get("target_score", 0.05 if target_class == "legitimate" else 0.95))
+        fusion_result["fused_score"] = target_score
+        risk_result["risk_score"] = target_score
+        risk_result["risk_percentage"] = round(target_score * 100, 2)
+        risk_result["risk_level"] = "low" if target_class == "legitimate" else "critical"
+        risk_result["classification"] = target_class
+        risk_result["active_learning_override"] = True
+        risk_result["override_reason"] = exemplar_override.get("reason", "Admin active learning exemplar")
 
 
     # --------------------------------------------------------

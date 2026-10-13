@@ -17,6 +17,7 @@ import {
   Terminal,
   Clock,
   Trash2,
+  Cpu,
 } from "lucide-react";
 
 import {
@@ -113,7 +114,11 @@ interface ScanHistoryItem {
   riskLevel: string;
 }
 
-export default function DetectionPage() {
+interface DetectionPageProps {
+  onNavigateAdmin?: () => void;
+}
+
+export default function DetectionPage({ onNavigateAdmin }: DetectionPageProps = {}) {
   const [email, setEmail] = useState("");
   const [url, setUrl] = useState("");
   const [activeTab, setActiveTab] = useState<"hybrid" | "email" | "url">("hybrid");
@@ -361,6 +366,31 @@ ${result.explanation.reasons.map((r) => `- [${r.severity.toUpperCase()}] ${r.sou
             </span>
             <span className="live-indicator" />
           </div>
+
+          {onNavigateAdmin && (
+            <button
+              onClick={onNavigateAdmin}
+              className="control-center-btn"
+              title="Open Extension Fleet & Control Center"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                background: "linear-gradient(135deg, #4f46e5, #7c3aed)",
+                color: "#ffffff",
+                padding: "6px 14px",
+                borderRadius: "20px",
+                fontSize: "12px",
+                fontWeight: "600",
+                border: "1px solid rgba(255,255,255,0.25)",
+                boxShadow: "0 2px 10px rgba(124,58,237,0.35)",
+                cursor: "pointer",
+              }}
+            >
+              <Cpu size={14} />
+              <span>Control Center</span>
+            </button>
+          )}
 
           <a
             href="/poster.html"
