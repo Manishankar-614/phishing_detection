@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Poster - Adaptive Multi-Modal Phishing Detection | Global Academy of Technology</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #e9eff6;
+      --header-bg: #092240;
+      --card-bg: #ffffff;
+      --card-border: #d0e0f0;
+      --primary-navy: #092240;
+      --accent-blue: #1565c0;
+      --accent-cyan: #0288d1;
+      --text-dark: #1e293b;
+      --text-muted: #475569;
+      --team-bg: #dbe9f6;
+      --tag-green: #2e7d32;
+      --border-radius: 8px;
+      --box-shadow: 0 4px 14px rgba(15, 34, 64, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #1e293b;
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px 10px 40px;
+      overflow-x: auto;
+    }
+
+    /* Top Control Bar */
+    .top-toolbar {
+      width: 100%;
+      max-width: 1440px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0f172a;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.12);
+      z-index: 100;
+    }
+
+    .toolbar-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #60a5fa;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 6px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .btn:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.22);
+    }
+    .btn-green {
+      background: #16a34a;
+    }
+    .btn-green:hover {
+      background: #15803d;
+    }
+
+    /* Poster Container (16:9 Standard Presentation / Poster Ratio) */
+    .poster-viewport {
+      width: 1440px;
+      height: 810px; /* Exact 16:9 ratio (1440 * 9 / 16) */
+      background-color: var(--bg-color);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* College Header */
+    .poster-header {
+      background: var(--header-bg);
+      color: white;
+      height: 96px;
+      display: flex;
+      align-items: center;
+      padding: 0 26px;
+      position: relative;
+      border-bottom: 3.5px solid #1565c0;
+    }
+
+    .logo-box {
+      background: #ffffff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 72px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    }
+
+    .logo-box img {
+      height: 62px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .header-text-container {
+      flex: 1;
+      text-align: center;
+      margin-right: 120px; /* balance out the logo on left */
+    }
+
+    .college-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+      color: #ffffff;
+      line-height: 1.15;
+    }
+
+    .dept-name {
+      font-size: 19.5px;
+      font-weight: 600;
+      color: #90caf9;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+
+    /* Main Poster Canvas */
+    .poster-body {
+      flex: 1;
+      padding: 12px 20px 12px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Title Card */
+    .title-card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--card-border);
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--box-shadow);
+      min-height: 50px;
+    }
+
+    .title-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .title-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 15.5px;
+      font-weight: 900;
+      color: var(--primary-navy);
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .title-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16.5px;
+      font-weight: 800;
+      color: var(--accent-blue);
+      letter-spacing: 0.2px;
+    }
+
+    .title-sdg {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: #e8f5e9;
+      border: 1.2px solid #a5d6a7;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--tag-green);
+      white-space: nowrap;
+    }
+
+    /* Team Banner */
+    .team-card {
+      background: var(--team-bg);
+      border-radius: var(--border-radius);
+      border: 1px solid #c4daf0;
+      padding: 6px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13.5px;
+      color: var(--primary-navy);
+      font-weight: 600;
+    }
+
+    .team-members {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .team-members span.tag {
+      font-weight: 800;
+      color: #0d47a1;
+      letter-spacing: 0.5px;
+    }
+
+    .team-guide {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .team-guide span.guide-tag {
+      font-weight: 800;
+      color: #0d47a1;
+    }
+
+    /* 6-Card Grid Layout */
+    .grid-container {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1.08fr 0.92fr;
+      grid-template-rows: 1fr 1.34fr;
+      gap: 11px;
+    }
+
+    /* Content Cards */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--box-shadow);
+      padding: 10px 15px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Royal Blue Left Accent Indicator (Exact match to template!) */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5.5px;
+      height: 100%;
+      background: #1565c0;
+      border-radius: 8px 0 0 8px;
+    }
+
+    .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 14.5px;
+      font-weight: 900;
+      color: var(--primary-navy);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 7px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1.5px solid #e2edf8;
+      padding-bottom: 4px;
+    }
+
+    .card-content {
+      flex: 1;
+      font-size: 11.5px;
+      line-height: 1.48;
+      color: #273849;
+    }
+
+    /* Abstract Text */
+    .abstract-text {
+      text-align: justify;
+      color: #334155;
+      font-size: 11.3px;
+      line-height: 1.52;
+    }
+
+    /* Bullet Lists */
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5.5px;
+    }
+
+    .bullet-list li {
+      position: relative;
+      padding-left: 14px;
+      font-size: 11.2px;
+      line-height: 1.42;
+      color: #2c3e50;
+    }
+
+    .bullet-list li::before {
+      content: '▪';
+      position: absolute;
+      left: 0;
+      top: -1px;
+      color: #1976d2;
+      font-size: 14px;
+    }
+
+    .bullet-list strong {
+      color: #0f2744;
+      font-weight: 700;
+    }
+
+    /* Objectives List with numbered badges */
+    .objectives-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .objectives-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      font-size: 11.1px;
+      line-height: 1.39;
+      color: #2c3e50;
+    }
+
+    .obj-num {
+      background: #e3f2fd;
+      color: #1565c0;
+      font-weight: 800;
+      font-size: 10px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      border: 1px solid #bbdefb;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    /* Methodology Diagram */
+    .methodology-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      height: 100%;
+    }
+
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .flow-step {
+      flex: 1;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 5px 6px;
+      text-align: center;
+    }
+
+    .flow-step-header {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 2px;
+      color: #0f2744;
+    }
+
+    .flow-step-desc {
+      font-size: 9.8px;
+      color: #475569;
+      line-height: 1.25;
+    }
+
+    .flow-arrow {
+      font-size: 12px;
+      font-weight: 900;
+      color: #1976d2;
+    }
+
+    .channel-box {
+      background: #f0f7ff;
+      border: 1px solid #b8daff;
+      border-radius: 5px;
+      padding: 4px 7px;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 10.3px;
+    }
+    .channel-title {
+      font-weight: 700;
+      color: #0d47a1;
+    }
+    .channel-model {
+      font-family: 'JetBrains Mono', monospace;
+      background: #0d47a1;
+      color: #fff;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 9.2px;
+      font-weight: 700;
+    }
+
+    .fusion-box {
+      background: linear-gradient(135deg, #e8f4fd, #e0f2fe);
+      border: 1.5px dashed #0288d1;
+      border-radius: 6px;
+      padding: 5px 8px;
+      text-align: center;
+      font-size: 10.3px;
+      font-weight: 600;
+      color: #01579b;
+    }
+
+    /* Table styling for Results */
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10.4px;
+      margin-bottom: 6px;
+    }
+
+    .results-table th {
+      background: #0f2d4f;
+      color: white;
+      padding: 4px 6px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 9.8px;
+      letter-spacing: 0.3px;
+    }
+    .results-table th:first-child {
+      text-align: left;
+    }
+
+    .results-table td {
+      padding: 3.5px 6px;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+    }
+    .results-table td:first-child {
+      text-align: left;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      color: #0f2d4f;
+    }
+
+    .results-table tr.highlight {
+      background: #e8f4fd;
+    }
+    .results-table tr.highlight td {
+      color: #0d47a1;
+      font-weight: 800;
+    }
+
+    .metric-pills {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 5px;
+    }
+
+    .pill {
+      background: #f1f8fe;
+      border: 1px solid #bce0fd;
+      border-radius: 5px;
+      padding: 4px 7px;
+      font-size: 9.8px;
+      line-height: 1.32;
+    }
+    .pill strong {
+      color: #0d47a1;
+      font-weight: 800;
+    }
+
+    /* Conclusion points */
+    .conclusion-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .conclusion-list li {
+      position: relative;
+      padding-left: 15px;
+      font-size: 11.2px;
+      line-height: 1.44;
+      color: #273849;
+    }
+    .conclusion-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      top: -1px;
+      color: #2e7d32;
+      font-weight: 900;
+      font-size: 13px;
+    }
+    .conclusion-list strong {
+      color: #092240;
+    }
+
+    /* Bottom Row (Applications & Final Outcome) */
+    .bottom-row {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr;
+      gap: 10px;
+      min-height: 42px;
+    }
+
+    .bottom-card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--box-shadow);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      font-size: 11.6px;
+      gap: 8px;
+    }
+
+    .bottom-tag {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--primary-navy);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .bottom-text {
+      color: #334155;
+      font-weight: 500;
+      line-height: 1.35;
+    }
+
+    .bottom-text strong {
+      color: #0f2744;
+      font-weight: 700;
+    }
+
+    /* PRINT & PDF EXPORT STYLES */
+    @media print {
+      body {
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      .top-toolbar {
+        display: none !important;
+      }
+
+      .poster-viewport {
+        width: 100vw !important;
+        height: 100vh !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+      }
+
+      @page {
+        size: A3 landscape;
+        margin: 0mm;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Interactive Toolbar for Presentation & Printing -->
+  <div class="top-toolbar">
+    <div class="toolbar-title">
+      <span>🎓 Global Academy of Technology</span>
+      <span style="color: #64748b;">|</span>
+      <span>Final Year Project Presentation Poster</span>
+    </div>
+    <div class="toolbar-actions">
+      <button class="btn btn-secondary" onclick="toggleFullscreen()">
+        🖥️ Fullscreen Mode
+      </button>
+      <button class="btn btn-green" onclick="window.print()">
+        🖨️ Print / Save as PDF
+      </button>
+      <a href="http://localhost:5173" target="_blank" class="btn">
+        🚀 Open Live App
+      </a>
+    </div>
+  </div>
+
+  <!-- The 16:9 Presentation Poster Canvas -->
+  <div class="poster-viewport" id="posterCanvas">
+
+    <!-- College Header -->
+    <header class="poster-header">
+      <div class="logo-box">
+        <img src="data:image/png;base64,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" alt="Global Academy of Technology Logo" />
+      </div>
+      <div class="header-text-container">
+        <h1 class="college-name">GLOBAL ACADEMY OF TECHNOLOGY</h1>
+        <h2 class="dept-name">Department of Artificial Intelligence and Machine Learning</h2>
+      </div>
+    </header>
+
+    <!-- Poster Content Canvas -->
+    <main class="poster-body">
+
+      <!-- Project Title Banner -->
+      <section class="title-card">
+        <div class="title-left">
+          <span class="title-label">PROJECT TITLE:</span>
+          <span class="title-text">Adaptive Multi-Modal Phishing Detection Using Deep Learning and Behavioural Anomaly Analysis</span>
+        </div>
+        <div class="title-sdg">
+          <span>🌐</span>
+          <span>SDGs: 9 (Industry, Innovation & Infrastructure) • 16 (Peace & Strong Institutions)</span>
+        </div>
+      </section>
+
+      <!-- Team & Guide Banner -->
+      <section class="team-card">
+        <div class="team-members">
+          <span class="tag">TEAM:</span>
+          <span>Manishankar Dinesh Bhat • Sharanabasava • Pranav S</span>
+        </div>
+        <div class="team-guide">
+          <span class="guide-tag">GUIDE:</span>
+          <span>Ramya C, Assistant Professor, Dept. of AIML</span>
+        </div>
+      </section>
+
+      <!-- 6-Card Main Section -->
+      <div class="grid-container">
+
+        <!-- CARD 1: ABSTRACT -->
+        <article class="card">
+          <h3 class="card-title">ABSTRACT</h3>
+          <div class="card-content">
+            <p class="abstract-text">
+              Phishing is one of the most critical cybersecurity threats today, severely exacerbated by AI-crafted and zero-day campaigns that evade static rule-based filters. Traditional detection approaches rely on a single data source—such as URL attributes or email body text—leaving significant blind spots. To resolve this limitation, we present an <strong>Adaptive Multi-Modal Phishing Detection Framework</strong> combining deep learning and real-time user behavioural analytics. Our architecture integrates a fine-tuned <strong>BERT transformer</strong> for contextual email text classification, a deep <strong>Character-level CNN</strong> with 14 structural features for malicious URL detection, and an <strong>Isolation Forest</strong> algorithm for identifying abnormal browsing dynamics. Individual predictions are fused through an intelligent multi-tier risk engine, eliminating single-point vulnerabilities and delivering robust, zero-day threat protection with 99.3% accuracy.
+            </p>
+          </div>
+        </article>
+
+        <!-- CARD 2: PROBLEM STATEMENT -->
+        <article class="card">
+          <h3 class="card-title">PROBLEM STATEMENT</h3>
+          <div class="card-content">
+            <ul class="bullet-list">
+              <li>
+                <strong>Rise of AI-Generated Phishing:</strong> Attackers routinely exploit Large Language Models to craft grammatically flawless, contextually authentic zero-day lures without static signatures.
+              </li>
+              <li>
+                <strong>Single-Source Blind Spots:</strong> Existing solutions analyze URLs or text in isolation; benign-looking emails containing stealthy links or clean URLs on compromised hosts slip through.
+              </li>
+              <li>
+                <strong>Neglect of User Behavioural Cues:</strong> Traditional systems completely ignore post-click interactions (excessive redirects, abnormal mouse velocity, multiple failed login attempts).
+              </li>
+              <li>
+                <strong>Fragility of Static Blacklists:</strong> Rule-based and whitelist techniques require continuous manual updating, degrade rapidly against new domains, and trigger frequent false positives.
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- CARD 3: OBJECTIVES -->
+        <article class="card">
+          <h3 class="card-title">OBJECTIVES</h3>
+          <div class="card-content">
+            <ul class="objectives-list">
+              <li>
+                <span class="obj-num">01</span>
+                <div><strong>Email Semantic Detection:</strong> Train and fine-tune transformer-based <strong>BERT</strong> to capture contextual semantics and coercive social-engineering language.</div>
+              </li>
+              <li>
+                <span class="obj-num">02</span>
+                <div><strong>Character-Level URL Analysis:</strong> Develop a deep <strong>Character-Level CNN</strong> with 14 lexical & structural attributes to catch obfuscated zero-day URLs.</div>
+              </li>
+              <li>
+                <span class="obj-num">03</span>
+                <div><strong>Behavioural Anomaly Scoring:</strong> Implement an <strong>Isolation Forest</strong> engine to flag post-click anomalies across 8 user interaction features in real time.</div>
+              </li>
+              <li>
+                <span class="obj-num">04</span>
+                <div><strong>Adaptive Multi-Modal Fusion:</strong> Synthesize multi-source signals via an intelligent weighting scheme to produce a calibrated, explainable risk score.</div>
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- CARD 4: METHODOLOGY / WORKFLOW -->
+        <article class="card">
+          <h3 class="card-title">METHODOLOGY / WORKFLOW</h3>
+          <div class="card-content methodology-diagram">
+            <!-- Channels -->
+            <div class="channel-box">
+              <span class="channel-title">📧 Email Ingestion & Preprocessing</span>
+              <span class="channel-model">BERT (Transformer)</span>
+            </div>
+            <div class="channel-box">
+              <span class="channel-title">🔗 URL Lexical & Structural Parsing</span>
+              <span class="channel-model">Char-CNN (14 Feats)</span>
+            </div>
+            <div class="channel-box">
+              <span class="channel-title">🖱️ Telemetry & Interaction Monitoring</span>
+              <span class="channel-model">Isolation Forest</span>
+            </div>
+
+            <!-- Workflow Pipeline Blocks -->
+            <div class="flow-row" style="margin-top: 3px;">
+              <div class="flow-step">
+                <div class="flow-step-header">1. Preprocess</div>
+                <div class="flow-step-desc">WordPiece Tokenizer & Min-Max Normalization</div>
+              </div>
+              <div class="flow-arrow">➔</div>
+              <div class="flow-step">
+                <div class="flow-step-header">2. Deep Inference</div>
+                <div class="flow-step-desc">Self-Attention & 1D Convolutions</div>
+              </div>
+              <div class="flow-arrow">➔</div>
+              <div class="flow-step">
+                <div class="flow-step-header">3. Fusion & Risk</div>
+                <div class="flow-step-desc">Non-Linear Dominant Weighting</div>
+              </div>
+            </div>
+
+            <!-- Fusion Indicator -->
+            <div class="fusion-box" style="margin-top: 5px;">
+              <strong>Multi-Tier Output:</strong> Low Risk (&lt;0.35) • Suspicious (0.35–0.65) • Phishing (≥0.65)
+            </div>
+          </div>
+        </article>
+
+        <!-- CARD 5: EXPERIMENTAL RESULTS -->
+        <article class="card">
+          <h3 class="card-title">EXPERIMENTAL RESULTS</h3>
+          <div class="card-content">
+            <!-- Performance Table from Published Paper Table II -->
+            <table class="results-table">
+              <thead>
+                <tr>
+                  <th>Model & Modality</th>
+                  <th>Accuracy</th>
+                  <th>Precision</th>
+                  <th>Recall</th>
+                  <th>F1-Score</th>
+                  <th>ROC-AUC</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="highlight">
+                  <td>BERT (Email Text)</td>
+                  <td>99.33%</td>
+                  <td>99.60%</td>
+                  <td>99.07%</td>
+                  <td>99.34%</td>
+                  <td>99.34%</td>
+                </tr>
+                <tr class="highlight">
+                  <td>CNN (URL Analysis)</td>
+                  <td>96.70%</td>
+                  <td>96.27%</td>
+                  <td>97.22%</td>
+                  <td>96.74%</td>
+                  <td>99.51%</td>
+                </tr>
+                <tr>
+                  <td>BiLSTM (Email Text)</td>
+                  <td>98.93%</td>
+                  <td>99.33%</td>
+                  <td>98.54%</td>
+                  <td>98.94%</td>
+                  <td>97.15%</td>
+                </tr>
+                <tr>
+                  <td>LSTM (Email Text)</td>
+                  <td>93.05%</td>
+                  <td>90.89%</td>
+                  <td>95.84%</td>
+                  <td>93.30%</td>
+                  <td>98.30%</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Performance Badges -->
+            <div class="metric-pills">
+              <div class="pill">
+                <strong>BERT Dominance:</strong> Highest MCC (98.67%) with exceptional false-positive suppression on business notifications.
+              </div>
+              <div class="pill">
+                <strong>CNN URL Efficacy:</strong> 99.51% ROC-AUC on detecting obfuscated, deep-nested subdomains and brand lures.
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- CARD 6: CONCLUSION -->
+        <article class="card">
+          <h3 class="card-title">CONCLUSION</h3>
+          <div class="card-content">
+            <ul class="conclusion-list">
+              <li>
+                <strong>Eliminates Single-Vector Blind Spots:</strong> Concurrently evaluating linguistic content, URL patterns, and user telemetry reliably defeats sophisticated multi-stage attacks.
+              </li>
+              <li>
+                <strong>Proven State-of-the-Art Accuracy:</strong> BERT achieved 99.33% accuracy on emails while CNN reached 99.51% ROC-AUC on URLs, confirming deep architectures outperform classical ML.
+              </li>
+              <li>
+                <strong>Behavioural Safety Net:</strong> Isolation Forest adds an invaluable post-click layer, flagging rapid redirects and abnormal interactions even when content appears benign.
+              </li>
+            </ul>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- Bottom Banners -->
+      <footer class="bottom-row">
+        <div class="bottom-card">
+          <span class="bottom-tag">APPLICATIONS:</span>
+          <span class="bottom-text">
+            Enterprise Email Gateways • Endpoint Web Browser Extensions • Banking & Fintech Real-Time Anti-Fraud Defense Systems
+          </span>
+        </div>
+        <div class="bottom-card">
+          <span class="bottom-tag">OUTCOME:</span>
+          <span class="bottom-text">
+            A unified multi-modal cybersecurity framework fusing BERT, Character CNN, and Isolation Forest to deliver high-confidence, real-time zero-day phishing protection with <strong>99.3% accuracy</strong>.
+          </span>
+        </div>
+      </footer>
+
+    </main>
+
+  </div>
+
+  <script>
+    function toggleFullscreen() {
+      const elem = document.getElementById('posterCanvas');
+      if (!document.fullscreenElement) {
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) {
+          elem.webkitRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+  </script>
+</body>
+</html>
