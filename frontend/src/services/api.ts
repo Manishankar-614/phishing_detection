@@ -4,7 +4,11 @@ import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig } from "
 // 1. ENVIRONMENT CONFIGURATION
 // ----------------------------------------------------------------------
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5000/api";
+  import.meta.env.VITE_API_BASE_URL ||
+  (typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
+    ? "http://127.0.0.1:5000/api"
+    : "https://alternatively-roommates-recall-sur.trycloudflare.com/api");
 
 // ----------------------------------------------------------------------
 // 2. DOMAIN & DTO TYPE DEFINITIONS
