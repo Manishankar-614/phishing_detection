@@ -33,7 +33,7 @@ EXPOSE 5000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
-  CMD curl -f http://localhost:5000/health || exit 1
+  CMD curl -f http://localhost:${PORT:-5000}/health || exit 1
 
-# Start production WSGI server
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--threads", "4", "--timeout", "120", "wsgi:app"]
+# Start production WSGI server with 1 worker and multi-threading for AI model memory efficiency
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 1 --threads 4 --timeout 180 wsgi:app"]
