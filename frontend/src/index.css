@@ -34,6 +34,15 @@
   --radius-md: 12px;
   --radius-lg: 18px;
   --radius-xl: 24px;
+
+  /* Creative Component Tokens (Matched to Original Cyber Dark Theme) */
+  --theme-accent: #06b6d4;
+  --theme-accent-alt: #0ea5e9;
+  --theme-glow: 0 0 25px rgba(6, 182, 212, 0.35);
+  --radar-color: #06b6d4;
+  --radar-sweep: rgba(6, 182, 212, 0.28);
+  --radar-grid: rgba(56, 189, 248, 0.2);
+  --card-glow: 0 8px 32px rgba(0, 0, 0, 0.37);
 }
 
 * {
@@ -2288,174 +2297,8 @@ body {
 }
 
 /* ============================================================
-   THEME SYSTEM: CYBERPUNK / MATRIX / SAPPHIRE / AMBER
+   CREATIVE COMPONENTS: AUDIO, RADAR, MATRIX, SANDBOX
    ============================================================ */
-
-/* Theme: Cyberpunk Neon (Default / Active) */
-.admin-dashboard-container[data-theme="cyberpunk"],
-body[data-theme="cyberpunk"] {
-  --bg-primary: #070314;
-  --bg-card: rgba(22, 12, 44, 0.72);
-  --bg-card-hover: rgba(36, 18, 70, 0.85);
-  --bg-input: #0e0722;
-  --border-subtle: rgba(168, 85, 247, 0.3);
-  --border-glow: rgba(244, 63, 94, 0.45);
-  --theme-accent: #f43f5e;
-  --theme-accent-alt: #00f0ff;
-  --theme-glow: 0 0 25px rgba(244, 63, 94, 0.35);
-  --text-primary: #fdf4ff;
-  --text-secondary: #e9d5ff;
-  --text-muted: #a855f7;
-  --radar-color: #00f0ff;
-  --radar-sweep: rgba(0, 240, 255, 0.28);
-  --radar-grid: rgba(168, 85, 247, 0.25);
-  --card-glow: 0 8px 32px rgba(244, 63, 94, 0.14);
-  background-color: #070314;
-  background-image: 
-    radial-gradient(circle at 10% 15%, rgba(244, 63, 94, 0.18) 0%, transparent 45%),
-    radial-gradient(circle at 90% 20%, rgba(0, 240, 255, 0.15) 0%, transparent 45%),
-    radial-gradient(circle at 50% 85%, rgba(168, 85, 247, 0.14) 0%, transparent 50%),
-    linear-gradient(rgba(168, 85, 247, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(168, 85, 247, 0.03) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 100% 100%, 36px 36px, 36px 36px;
-}
-
-/* Theme: Matrix Phosphor Terminal */
-.admin-dashboard-container[data-theme="matrix"],
-body[data-theme="matrix"] {
-  --bg-primary: #020904;
-  --bg-card: rgba(4, 24, 12, 0.78);
-  --bg-card-hover: rgba(8, 38, 20, 0.9);
-  --bg-input: #011206;
-  --border-subtle: rgba(16, 185, 129, 0.35);
-  --border-glow: rgba(0, 255, 102, 0.5);
-  --theme-accent: #00ff66;
-  --theme-accent-alt: #10b981;
-  --theme-glow: 0 0 25px rgba(0, 255, 102, 0.35);
-  --text-primary: #ecfdf5;
-  --text-secondary: #a7f3d0;
-  --text-muted: #10b981;
-  --radar-color: #00ff66;
-  --radar-sweep: rgba(0, 255, 102, 0.3);
-  --radar-grid: rgba(16, 185, 129, 0.28);
-  --card-glow: 0 8px 32px rgba(0, 255, 102, 0.14);
-  background-color: #020904;
-  background-image: 
-    radial-gradient(circle at 15% 15%, rgba(0, 255, 102, 0.15) 0%, transparent 45%),
-    radial-gradient(circle at 85% 25%, rgba(16, 185, 129, 0.12) 0%, transparent 45%),
-    radial-gradient(circle at 50% 80%, rgba(5, 150, 105, 0.1) 0%, transparent 50%),
-    linear-gradient(rgba(0, 255, 102, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 255, 102, 0.04) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px, 32px 32px;
-}
-
-/* Theme: Quantum Sapphire SOC */
-.admin-dashboard-container[data-theme="sapphire"],
-body[data-theme="sapphire"] {
-  --bg-primary: #020817;
-  --bg-card: rgba(10, 24, 52, 0.75);
-  --bg-card-hover: rgba(18, 40, 84, 0.88);
-  --bg-input: #05102a;
-  --border-subtle: rgba(56, 189, 248, 0.3);
-  --border-glow: rgba(14, 165, 233, 0.45);
-  --theme-accent: #38bdf8;
-  --theme-accent-alt: #6366f1;
-  --theme-glow: 0 0 25px rgba(56, 189, 248, 0.35);
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #38bdf8;
-  --radar-color: #38bdf8;
-  --radar-sweep: rgba(56, 189, 248, 0.28);
-  --radar-grid: rgba(56, 189, 248, 0.22);
-  --card-glow: 0 8px 32px rgba(56, 189, 248, 0.14);
-  background-color: #020817;
-  background-image: 
-    radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.16) 0%, transparent 45%),
-    radial-gradient(circle at 85% 25%, rgba(99, 102, 241, 0.14) 0%, transparent 45%),
-    radial-gradient(circle at 50% 80%, rgba(14, 165, 233, 0.1) 0%, transparent 50%),
-    linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 100% 100%, 36px 36px, 36px 36px;
-}
-
-/* Theme: Solar Hazard Amber */
-.admin-dashboard-container[data-theme="amber"],
-body[data-theme="amber"] {
-  --bg-primary: #0a0703;
-  --bg-card: rgba(28, 18, 8, 0.76);
-  --bg-card-hover: rgba(48, 28, 12, 0.88);
-  --bg-input: #140d04;
-  --border-subtle: rgba(245, 158, 11, 0.32);
-  --border-glow: rgba(249, 115, 22, 0.45);
-  --theme-accent: #f59e0b;
-  --theme-accent-alt: #f97316;
-  --theme-glow: 0 0 25px rgba(245, 158, 11, 0.35);
-  --text-primary: #fffbeb;
-  --text-secondary: #fde68a;
-  --text-muted: #f59e0b;
-  --radar-color: #f59e0b;
-  --radar-sweep: rgba(245, 158, 11, 0.28);
-  --radar-grid: rgba(245, 158, 11, 0.22);
-  --card-glow: 0 8px 32px rgba(245, 158, 11, 0.14);
-  background-color: #0a0703;
-  background-image: 
-    radial-gradient(circle at 15% 15%, rgba(245, 158, 11, 0.16) 0%, transparent 45%),
-    radial-gradient(circle at 85% 25%, rgba(249, 115, 22, 0.14) 0%, transparent 45%),
-    radial-gradient(circle at 50% 80%, rgba(234, 88, 12, 0.1) 0%, transparent 50%),
-    linear-gradient(rgba(245, 158, 11, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(245, 158, 11, 0.03) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 100% 100%, 36px 36px, 36px 36px;
-}
-
-/* ============================================================
-   CREATIVE #1: THEME & AUDIO TOOLBAR
-   ============================================================ */
-.theme-selector-bar {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 4px 8px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-}
-
-.theme-pill-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--text-secondary);
-  padding: 6px 12px;
-  border-radius: var(--radius-sm);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.theme-pill-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary);
-}
-
-.theme-pill-btn.active {
-  background: var(--bg-card-hover);
-  border-color: var(--theme-accent);
-  color: var(--text-primary);
-  box-shadow: 0 0 12px rgba(244, 63, 94, 0.25);
-}
-
-.theme-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-.theme-dot.cyberpunk { background: #f43f5e; box-shadow: 0 0 8px #f43f5e; }
-.theme-dot.matrix { background: #00ff66; box-shadow: 0 0 8px #00ff66; }
-.theme-dot.sapphire { background: #38bdf8; box-shadow: 0 0 8px #38bdf8; }
-.theme-dot.amber { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
 
 .audio-toggle-btn {
   display: flex;
@@ -2487,31 +2330,40 @@ body[data-theme="amber"] {
    CREATIVE #2: LIVE GLOBAL INTERCEPT STREAM (TICKER)
    ============================================================ */
 .live-ticker-banner {
-  background: rgba(0, 0, 0, 0.45);
-  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid var(--border-subtle);
   padding: 8px 16px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   font-size: 12px;
   overflow: hidden;
   border-radius: var(--radius-md);
   margin-bottom: 20px;
+  position: relative;
 }
 
 .ticker-lead-badge {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(244, 63, 94, 0.18);
-  border: 1px solid rgba(244, 63, 94, 0.4);
-  color: #f43f5e;
-  padding: 3px 8px;
+  background: rgba(14, 165, 233, 0.18);
+  border: 1px solid rgba(14, 165, 233, 0.4);
+  color: #38bdf8;
+  padding: 4px 10px;
   border-radius: 4px;
   font-weight: 700;
   font-size: 11px;
   letter-spacing: 0.05em;
   white-space: nowrap;
+  flex-shrink: 0;
+  z-index: 3;
+}
+
+.ticker-track-wrap {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
 }
 
 .ticker-track {

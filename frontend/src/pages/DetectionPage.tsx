@@ -392,31 +392,6 @@ ${result.explanation.reasons.map((r) => `- [${r.severity.toUpperCase()}] ${r.sou
             </button>
           )}
 
-          <a
-            href="/poster.html"
-            target="_blank"
-            rel="noreferrer"
-            className="poster-link-btn"
-            title="Open Single-Page Presentation Poster"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              background: "linear-gradient(135deg, #1e40af, #3b82f6)",
-              color: "#ffffff",
-              padding: "6px 14px",
-              borderRadius: "20px",
-              fontSize: "12px",
-              fontWeight: "600",
-              textDecoration: "none",
-              border: "1px solid rgba(255,255,255,0.2)",
-              boxShadow: "0 2px 8px rgba(37,99,235,0.3)",
-              cursor: "pointer",
-            }}
-          >
-            🎓 Presentation Poster
-          </a>
-
           <div className="version-tag">v2.0 • BERT+CNN</div>
         </div>
       </nav>

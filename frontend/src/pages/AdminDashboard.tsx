@@ -11,7 +11,6 @@ import {
   Sparkles,
   UserCheck,
   X,
-  ExternalLink,
   ChevronRight,
   TrendingUp,
   Volume2,
@@ -148,13 +147,7 @@ interface AdminDashboardProps {
   onNavigateScanner: () => void;
 }
 
-type ThemeType = "cyberpunk" | "matrix" | "sapphire" | "amber";
-
 export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProps) {
-  // Theme State
-  const [theme, setTheme] = useState<ThemeType>(() => {
-    return (localStorage.getItem("phishguard_theme") as ThemeType) || "cyberpunk";
-  });
   const [audioEnabled, setAudioEnabled] = useState<boolean>(() => {
     const saved = localStorage.getItem("phishguard_audio");
     return saved !== null ? saved === "true" : true;
@@ -199,23 +192,17 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  // Sync theme changes to HTML
+  // Ensure default clean cyber theme
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("phishguard_theme", theme);
-  }, [theme]);
+    document.documentElement.removeAttribute("data-theme");
+    localStorage.removeItem("phishguard_theme");
+  }, []);
 
   // Sync audio toggle
   useEffect(() => {
     cyberAudio.enabled = audioEnabled;
     localStorage.setItem("phishguard_audio", String(audioEnabled));
   }, [audioEnabled]);
-
-  const handleThemeChange = (newTheme: ThemeType) => {
-    cyberAudio.playClick();
-    setTheme(newTheme);
-    showToast(`Theme switched to ${newTheme.toUpperCase()}`);
-  };
 
   const handleAudioToggle = () => {
     const next = !audioEnabled;
@@ -433,7 +420,7 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
   };
 
   return (
-    <div className="admin-dashboard-container" data-theme={theme}>
+    <div className="admin-dashboard-container">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="admin-toast">
@@ -450,26 +437,28 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
           <Zap size={13} />
           <span>LIVE THREAT RADAR FEED</span>
         </div>
-        <div className="ticker-track">
-          <div className="ticker-item">
-            <span className="ticker-tag red">BLOCKED ZERO-DAY</span>
-            <span>paypal-security-account-auth.top (Risk: 99.4% • Char-CNN Homoglyph Alert)</span>
-          </div>
-          <div className="ticker-item">
-            <span className="ticker-tag green">EXEMPLAR OVERRIDE</span>
-            <span>mit.edu (Verified Legitimate via Admin Feedback • Zero Errors)</span>
-          </div>
-          <div className="ticker-item">
-            <span className="ticker-tag red">SPEAR-PHISH INTERCEPT</span>
-            <span>urgent-billing-statement.xyz (BERT Attention Urgency Triggered)</span>
-          </div>
-          <div className="ticker-item">
-            <span className="ticker-tag cyan">ACTIVE TELEMETRY</span>
-            <span>Chrome Fleet Extension Synced • 100% Behavioral Anomaly Coverage</span>
-          </div>
-          <div className="ticker-item">
-            <span className="ticker-tag purple">MODEL FUSION</span>
-            <span>Ensemble Consensus Rate: 99.8% • Multi-Modal Dynamic Weighting</span>
+        <div className="ticker-track-wrap">
+          <div className="ticker-track">
+            <div className="ticker-item">
+              <span className="ticker-tag red">BLOCKED ZERO-DAY</span>
+              <span>paypal-security-account-auth.top (Risk: 99.4% • Char-CNN Homoglyph Alert)</span>
+            </div>
+            <div className="ticker-item">
+              <span className="ticker-tag green">EXEMPLAR OVERRIDE</span>
+              <span>mit.edu (Verified Legitimate via Admin Feedback • Zero Errors)</span>
+            </div>
+            <div className="ticker-item">
+              <span className="ticker-tag red">SPEAR-PHISH INTERCEPT</span>
+              <span>urgent-billing-statement.xyz (BERT Attention Urgency Triggered)</span>
+            </div>
+            <div className="ticker-item">
+              <span className="ticker-tag cyan">ACTIVE TELEMETRY</span>
+              <span>Chrome Fleet Extension Synced • 100% Behavioral Anomaly Coverage</span>
+            </div>
+            <div className="ticker-item">
+              <span className="ticker-tag purple">MODEL FUSION</span>
+              <span>Ensemble Consensus Rate: 99.8% • Multi-Modal Dynamic Weighting</span>
+            </div>
           </div>
         </div>
       </div>
@@ -491,38 +480,6 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
         </div>
 
         <div className="admin-header-actions">
-          {/* CREATIVE: Theme Selector Toolbar */}
-          <div className="theme-selector-bar" title="Select Control Center Visual Theme">
-            <button
-              className={`theme-pill-btn ${theme === "cyberpunk" ? "active" : ""}`}
-              onClick={() => handleThemeChange("cyberpunk")}
-            >
-              <span className="theme-dot cyberpunk" />
-              <span>Cyberpunk</span>
-            </button>
-            <button
-              className={`theme-pill-btn ${theme === "matrix" ? "active" : ""}`}
-              onClick={() => handleThemeChange("matrix")}
-            >
-              <span className="theme-dot matrix" />
-              <span>Matrix</span>
-            </button>
-            <button
-              className={`theme-pill-btn ${theme === "sapphire" ? "active" : ""}`}
-              onClick={() => handleThemeChange("sapphire")}
-            >
-              <span className="theme-dot sapphire" />
-              <span>Sapphire</span>
-            </button>
-            <button
-              className={`theme-pill-btn ${theme === "amber" ? "active" : ""}`}
-              onClick={() => handleThemeChange("amber")}
-            >
-              <span className="theme-dot amber" />
-              <span>Amber</span>
-            </button>
-          </div>
-
           {/* CREATIVE: Audio FX Toggle */}
           <button
             className={`audio-toggle-btn ${audioEnabled ? "active" : ""}`}
@@ -535,18 +492,8 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
 
           <button className="nav-switch-btn" onClick={onNavigateScanner}>
             <ShieldCheck size={16} />
-            <span>Scanner</span>
+            <span>Live Threat Scanner</span>
           </button>
-
-          <a
-            href="/poster.html"
-            target="_blank"
-            rel="noreferrer"
-            className="nav-switch-btn poster-btn"
-          >
-            <span>🎓 Poster</span>
-            <ExternalLink size={13} />
-          </a>
 
           <button
             className="action-btn btn-refresh"
