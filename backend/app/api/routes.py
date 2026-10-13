@@ -298,4 +298,83 @@ def trigger_admin_retrain():
         return jsonify({
             "status": "error",
             "message": f"Failed to execute retraining: {str(e)}"
-        }), 500
+        }), 500
+
+
+@api.route("/admin/policies", methods=["GET"])
+def get_admin_policies():
+    """Returns active domain and pattern policies."""
+    try:
+        policies = feedback_manager.get_policies()
+        return jsonify({
+            "status": "success",
+            "data": policies
+        })
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Failed to fetch policies: {str(e)}"
+        }), 500
+
+
+@api.route("/admin/policies", methods=["POST"])
+def add_admin_policy():
+    """Adds a domain override policy directly from the SOC control panel."""
+    try:
+        data = request.get_json(silent=True) or {}
+        domain = data.get("domain", "").strip()
+        classification = data.get("classification", "legitimate").strip().lower()
+        reason = data.get("reason", "Added via SOC Policy Manager")
+
+        if not domain:
+            return jsonify({"status": "error", "message": "Domain is required."}), 400
+        if classification not in ("legitimate", "phishing"):
+            return jsonify({"status": "error", "message": "Classification must be 'legitimate' or 'phishing'."}), 400
+
+        updated = feedback_manager.add_domain_policy(domain, classification, reason)
+        return jsonify({
+            "status": "success",
+            "message": f"Policy for '{domain}' saved as {classification.upper()}.",
+            "data": updated
+        })
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Failed to add policy: {str(e)}"
+        }), 500
+
+
+@api.route("/admin/policies", methods=["DELETE"])
+def delete_admin_policy():
+    """Removes a domain policy from active calibration memory."""
+    try:
+        data = request.get_json(silent=True) or {}
+        domain = data.get("domain", "").strip()
+        if not domain:
+            return jsonify({"status": "error", "message": "Domain is required."}), 400
+
+        updated = feedback_manager.delete_domain_policy(domain)
+        return jsonify({
+            "status": "success",
+            "message": f"Policy for '{domain}' removed.",
+            "data": updated
+        })
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Failed to delete policy: {str(e)}"
+        }), 500
+
+
+@api.route("/admin/benchmark", methods=["GET"])
+def get_admin_benchmark():
+    """Returns scientific validation benchmark performance metrics and confusion matrix."""
+    try:
+        benchmark = feedback_manager.get_benchmark_metrics()
+        return jsonify(benchmark)
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Failed to compute benchmark metrics: {str(e)}"
+        }), 500
+

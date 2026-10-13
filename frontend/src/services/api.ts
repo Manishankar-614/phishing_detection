@@ -286,4 +286,73 @@ export const triggerRetraining = async (): Promise<RetrainingResponse> => {
   return response.data;
 };
 
+export interface DomainPolicyItem {
+  classification: "legitimate" | "phishing";
+  target_score: number;
+  reason: string;
+  updated_at: string;
+}
+
+export interface AdminPolicyData {
+  domain_policies: Record<string, DomainPolicyItem>;
+  email_patterns: Record<string, DomainPolicyItem>;
+  total_active_rules: number;
+  version: string;
+}
+
+export interface BenchmarkResponse {
+  status: string;
+  test_dataset: string;
+  sample_count: number;
+  metrics: {
+    accuracy: number;
+    precision: number;
+    recall: number;
+    f1_score: number;
+    false_positive_rate: number;
+    false_negative_rate: number;
+  };
+  confusion_matrix: {
+    true_negatives: number;
+    false_positives: number;
+    false_negatives: number;
+    true_positives: number;
+  };
+  ensemble_weights: {
+    bert_weight: number;
+    url_weight: number;
+    behavior_weight: number;
+  };
+}
+
+export const fetchPolicies = async (): Promise<AdminPolicyData> => {
+  const response = await apiClient.get<{ status: string; data: AdminPolicyData }>("/admin/policies");
+  return response.data.data;
+};
+
+export const addDomainPolicy = async (payload: {
+  domain: string;
+  classification: "legitimate" | "phishing";
+  reason?: string;
+}): Promise<AdminPolicyData> => {
+  const response = await apiClient.post<{ status: string; message: string; data: AdminPolicyData }>(
+    "/admin/policies",
+    payload
+  );
+  return response.data.data;
+};
+
+export const deleteDomainPolicy = async (domain: string): Promise<AdminPolicyData> => {
+  const response = await apiClient.delete<{ status: string; message: string; data: AdminPolicyData }>(
+    "/admin/policies",
+    { data: { domain } }
+  );
+  return response.data.data;
+};
+
+export const fetchBenchmark = async (): Promise<BenchmarkResponse> => {
+  const response = await apiClient.get<BenchmarkResponse>("/admin/benchmark");
+  return response.data;
+};
+
 export default apiClient;
