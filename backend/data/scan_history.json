@@ -1,5 +1,37 @@
 [
   {
+    "id": "eb4711e9-76d6-4b24-851d-421e7bb6fdb0",
+    "timestamp": "2026-10-13T10:35:52.727532",
+    "url": "http://localhost:5173/?view=admin",
+    "email": "",
+    "target": "http://localhost:5173/?view=admin",
+    "classification": "legitimate",
+    "risk_level": "low",
+    "risk_score": 0.1194,
+    "risk_percentage": 11.94,
+    "email_score": 0.0,
+    "url_score": 0.0049,
+    "behavior_score": 0.7678,
+    "source": "Web Portal & Extension Hook",
+    "feedback": null
+  },
+  {
+    "id": "a7930b9f-7238-4015-9be2-f12ed10797a4",
+    "timestamp": "2026-10-13T10:30:35.387886",
+    "url": "http://localhost:5173/?view=admin",
+    "email": "",
+    "target": "http://localhost:5173/?view=admin",
+    "classification": "legitimate",
+    "risk_level": "low",
+    "risk_score": 0.1194,
+    "risk_percentage": 11.94,
+    "email_score": 0.0,
+    "url_score": 0.0049,
+    "behavior_score": 0.7678,
+    "source": "Web Portal & Extension Hook",
+    "feedback": null
+  },
+  {
     "id": "5c59e67e-655c-42fc-85eb-bfbf17951083",
     "timestamp": "2026-10-07T04:14:02.232331",
     "url": "https://github.com/Manishankar-614/phishing_detection",
