@@ -338,41 +338,12 @@ class FeedbackManager:
 
         self._write_history(history)
 
-        # Update Active Calibration Exemplar Memory immediately
-        calib = self._read_calibration()
-        url = target_scan.get("url", "").strip()
-        email_text = target_scan.get("email", "").strip()
-
-        if url:
-            domain = url.split("://", 1)[-1].split("/", 1)[0].split(":", 1)[0].lower()
-            if domain:
-                calib.setdefault("domain_overrides", {})[domain] = {
-                    "classification": corrected_label,
-                    "target_score": 0.05 if corrected_label == "legitimate" else 0.95,
-                    "reason": reason,
-                    "updated_at": datetime.now().isoformat()
-                }
-
-        if email_text:
-            # Take a prominent normalized 8-word fingerprint
-            words = [w for w in re.findall(r"\b[a-zA-Z]{4,}\b", email_text.lower())][:8]
-            if len(words) >= 4:
-                fp = " ".join(words)
-                calib.setdefault("email_pattern_overrides", {})[fp] = {
-                    "classification": corrected_label,
-                    "target_score": 0.05 if corrected_label == "legitimate" else 0.95,
-                    "reason": reason,
-                    "updated_at": datetime.now().isoformat()
-                }
-
-        self._write_calibration(calib)
-
         return {
             "status": "success",
             "scan_id": target_scan["id"],
             "original_label": original_label,
             "corrected_label": corrected_label,
-            "message": f"Successfully overridden {original_label.upper()} to {corrected_label.upper()}. Added to Active Learning Memory.",
+            "message": f"Successfully registered correction ({original_label.upper()} -> {corrected_label.upper()}). Saved for adaptive active retraining.",
             "feedback": target_scan["feedback"]
         }
 
@@ -444,70 +415,6 @@ class FeedbackManager:
                 "active_email_overrides": len(calib.get("email_pattern_overrides", {}))
             }
         }
-
-    # --------------------------------------------------------
-    # FAST EXEMPLAR LOOKUP (USED BY PREDICTORS)
-    # --------------------------------------------------------
-    def check_exemplar_override(self, url: str = "", email_text: str = "") -> Optional[Dict[str, Any]]:
-        """Returns admin-corrected override if matched."""
-        calib = self._read_calibration()
-
-        if url:
-            domain = url.split("://", 1)[-1].split("/", 1)[0].split(":", 1)[0].lower().strip()
-            domain_overrides = calib.get("domain_overrides", {})
-            if domain in domain_overrides:
-                return domain_overrides[domain]
-
-        if email_text:
-            words = [w for w in re.findall(r"\b[a-zA-Z]{4,}\b", email_text.lower())][:8]
-            if len(words) >= 4:
-                fp = " ".join(words)
-                email_overrides = calib.get("email_pattern_overrides", {})
-                for saved_fp, val in email_overrides.items():
-                    # Substring match
-                    match_count = sum(1 for w in words if w in saved_fp)
-                    if match_count >= 4:
-                        return val
-
-        return None
-
-    # --------------------------------------------------------
-    # POLICY & WHITELIST/BLACKLIST MANAGEMENT
-    # --------------------------------------------------------
-    def get_policies(self) -> Dict[str, Any]:
-        """Returns all domain and pattern overrides currently enforced."""
-        calib = self._read_calibration()
-        return {
-            "domain_policies": calib.get("domain_overrides", {}),
-            "email_patterns": calib.get("email_pattern_overrides", {}),
-            "version": calib.get("version", "v2.2-adaptive"),
-            "total_active_rules": len(calib.get("domain_overrides", {})) + len(calib.get("email_pattern_overrides", {}))
-        }
-
-    def add_domain_policy(self, domain: str, classification: str, reason: str = "") -> Dict[str, Any]:
-        """Adds a direct domain override rule to active calibration memory."""
-        domain = domain.split("://", 1)[-1].split("/", 1)[0].split(":", 1)[0].lower().strip()
-        if not domain:
-            raise ValueError("Invalid domain specified.")
-
-        calib = self._read_calibration()
-        calib.setdefault("domain_overrides", {})[domain] = {
-            "classification": classification,
-            "target_score": 0.05 if classification == "legitimate" else 0.95,
-            "reason": reason or f"Policy enforced by SOC administrator",
-            "updated_at": datetime.now().isoformat()
-        }
-        self._write_calibration(calib)
-        return self.get_policies()
-
-    def delete_domain_policy(self, domain: str) -> Dict[str, Any]:
-        """Removes an active domain override rule from calibration memory."""
-        domain = domain.lower().strip()
-        calib = self._read_calibration()
-        if "domain_overrides" in calib and domain in calib["domain_overrides"]:
-            del calib["domain_overrides"][domain]
-            self._write_calibration(calib)
-        return self.get_policies()
 
     # --------------------------------------------------------
     # SCIENTIFIC BENCHMARK & CONFUSION MATRIX EVALUATION

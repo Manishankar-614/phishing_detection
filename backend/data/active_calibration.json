@@ -2,28 +2,8 @@
   "version": "v2.2-adaptive",
   "last_retrained": "2026-10-13T12:31:44.724706",
   "total_retrained_samples": 2,
-  "domain_overrides": {
-    "mail.google.com": {
-      "classification": "legitimate",
-      "target_score": 0.05,
-      "reason": "Admin manual ground-truth adjustment",
-      "updated_at": "2026-10-13T12:30:53.873384"
-    }
-  },
-  "email_pattern_overrides": {
-    "boruto uzumaki making game character sketch devil soul": {
-      "classification": "phishing",
-      "target_score": 0.95,
-      "reason": "Admin manual ground-truth adjustment",
-      "updated_at": "2026-10-13T12:29:22.775505"
-    },
-    "divine lord hanuman digital painting portrait panchamukhi hanuman": {
-      "classification": "legitimate",
-      "target_score": 0.05,
-      "reason": "Admin manual ground-truth adjustment",
-      "updated_at": "2026-10-13T12:30:53.873452"
-    }
-  },
+  "domain_overrides": {},
+  "email_pattern_overrides": {},
   "weights_adjustment": {
     "email_weight": 0.55,
     "url_weight": 0.4,

@@ -17,8 +17,6 @@ import {
   Download,
   FileSpreadsheet,
   Printer,
-  Trash2,
-  Plus,
   Globe,
   Scale,
   FileText,
@@ -29,15 +27,11 @@ import {
   fetchAdminScans,
   submitCorrection,
   triggerRetraining,
-  fetchPolicies,
-  addDomainPolicy,
-  deleteDomainPolicy,
   fetchBenchmark,
   analyzePhishing,
   type AdminStats,
   type AdminScanItem,
   type RetrainingResponse,
-  type AdminPolicyData,
   type BenchmarkResponse,
   type DetectionResult,
 } from "../services/api";
@@ -54,13 +48,6 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
   const [refreshing, setRefreshing] = useState(false);
   const [filterType, setFilterType] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
-
-  // Enterprise Policies State
-  const [policies, setPolicies] = useState<AdminPolicyData | null>(null);
-  const [newPolicyDomain, setNewPolicyDomain] = useState<string>("");
-  const [newPolicyClassification, setNewPolicyClassification] = useState<"legitimate" | "phishing">("legitimate");
-  const [newPolicyReason, setNewPolicyReason] = useState<string>("");
-  const [submittingPolicy, setSubmittingPolicy] = useState(false);
 
   // Scientific Benchmark State
   const [benchmark, setBenchmark] = useState<BenchmarkResponse | null>(null);
@@ -135,17 +122,15 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
   const loadData = async () => {
     try {
       setRefreshing(true);
-      const [statsData, scansData, allScansData, policiesData, benchmarkData] = await Promise.all([
+      const [statsData, scansData, allScansData, benchmarkData] = await Promise.all([
         fetchAdminStats(),
         fetchAdminScans({ filter: filterType, search: searchTerm, limit: 100 }),
         fetchAdminScans({ filter: "all", search: "", limit: 100 }),
-        fetchPolicies().catch(() => null),
         fetchBenchmark().catch(() => null),
       ]);
       setStats(statsData);
       setScans(scansData.scans);
       setAllScans(allScansData.scans);
-      if (policiesData) setPolicies(policiesData);
       if (benchmarkData) setBenchmark(benchmarkData);
     } catch (err) {
       console.error("Failed to load admin telemetry:", err);
@@ -344,47 +329,6 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
   };
 
   // -------------------------------------------------------------
-  // Fleet Whitelist & Blacklist Policy Management
-  // -------------------------------------------------------------
-  const handleAddPolicy = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newPolicyDomain.trim()) {
-      showToast("Please enter a domain (e.g. login.internal-corp.net)");
-      return;
-    }
-    try {
-      setSubmittingPolicy(true);
-      const updated = await addDomainPolicy({
-        domain: newPolicyDomain.trim(),
-        classification: newPolicyClassification,
-        reason: newPolicyReason.trim() || "Policy enforced by SOC administrator",
-      });
-      setPolicies(updated);
-      setNewPolicyDomain("");
-      setNewPolicyReason("");
-      showToast(
-        `Policy for '${newPolicyDomain.trim()}' enforced as ${newPolicyClassification.toUpperCase()}!`
-      );
-    } catch (err) {
-      console.error("Failed to add domain policy:", err);
-      showToast("Error adding policy rule.");
-    } finally {
-      setSubmittingPolicy(false);
-    }
-  };
-
-  const handleDeletePolicy = async (domain: string) => {
-    try {
-      const updated = await deleteDomainPolicy(domain);
-      setPolicies(updated);
-      showToast(`Policy rule for '${domain}' removed.`);
-    } catch (err) {
-      console.error("Failed to delete policy rule:", err);
-      showToast("Error removing policy rule.");
-    }
-  };
-
-  // -------------------------------------------------------------
   // Admin Quick Threat Inspector
   // -------------------------------------------------------------
   const handleRunInspection = async () => {
@@ -432,27 +376,6 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
       showToast("Failed to run quick inspection.");
     } finally {
       setInspecting(false);
-    }
-  };
-
-  const handleQuickAddPolicyFromInspector = async (
-    classification: "legitimate" | "phishing"
-  ) => {
-    let domain = inspectorInput.trim();
-    if (inspectorType === "email") {
-      domain = domain.slice(0, 40).replace(/[^a-zA-Z0-9-.]/g, "-");
-    }
-    try {
-      const updated = await addDomainPolicy({
-        domain,
-        classification,
-        reason: `Quick override added via Admin Threat Inspector (${classification.toUpperCase()})`,
-      });
-      setPolicies(updated);
-      showToast(`Rule added: '${domain}' is now ${classification.toUpperCase()}!`);
-    } catch (err) {
-      console.error("Failed to add policy from inspector:", err);
-      showToast("Error adding policy.");
     }
   };
 
@@ -1266,133 +1189,6 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
               </div>
             </div>
           </div>
-
-          {/* Card 2: Enterprise Access Policy & Whitelist/Blacklist Manager */}
-          <div className="gov-card policy-panel">
-            <div className="gov-card-header">
-              <div className="gov-title-group">
-                <Globe size={20} className="text-purple" />
-                <div>
-                  <h3 className="chart-title" style={{ margin: 0 }}>
-                    Fleet Domain Policies (Whitelist & Blacklist)
-                  </h3>
-                  <p className="chart-desc" style={{ margin: 0 }}>
-                    Deterministic override rules enforced instantly in 0ms
-                  </p>
-                </div>
-              </div>
-              <span className="policy-count-pill">
-                {policies ? `${policies.total_active_rules} Rules Active` : "2 Rules Active"}
-              </span>
-            </div>
-
-            {/* Quick Add Policy Form */}
-            <form className="policy-add-form" onSubmit={handleAddPolicy}>
-              <div className="policy-form-row">
-                <div className="policy-input-group flex-1">
-                  <label className="form-label">Domain or Hostname:</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. portal.internal-corp.net or suspect-login.xyz"
-                    value={newPolicyDomain}
-                    onChange={(e) => setNewPolicyDomain(e.target.value)}
-                    className="policy-text-input"
-                  />
-                </div>
-                <div className="policy-input-group w-auto">
-                  <label className="form-label">Action / Rule:</label>
-                  <select
-                    value={newPolicyClassification}
-                    onChange={(e) =>
-                      setNewPolicyClassification(
-                        e.target.value as "legitimate" | "phishing"
-                      )
-                    }
-                    className="policy-select"
-                  >
-                    <option value="legitimate">🛡️ Whitelist (Allow)</option>
-                    <option value="phishing">🚫 Blacklist (Block)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="policy-form-row">
-                <div className="policy-input-group flex-1">
-                  <label className="form-label">Justification / Reason (Optional):</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Corporate partner portal, verified phishing campaign..."
-                    value={newPolicyReason}
-                    onChange={(e) => setNewPolicyReason(e.target.value)}
-                    className="policy-text-input"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={submittingPolicy || !newPolicyDomain.trim()}
-                  className="btn-enforce-policy"
-                >
-                  <Plus size={15} />
-                  <span>{submittingPolicy ? "Enforcing..." : "Enforce Policy"}</span>
-                </button>
-              </div>
-            </form>
-
-            {/* Active Policies List */}
-            <div className="active-policies-scroll">
-              <div className="policies-list-header">
-                <span>
-                  Active Domain Overrides ({policies ? Object.keys(policies.domain_policies).length : 0})
-                </span>
-                <span className="text-muted text-xs">Live Active Calibration Memory</span>
-              </div>
-
-              {policies && Object.keys(policies.domain_policies).length > 0 ? (
-                <div className="policy-items-stack">
-                  {Object.entries(policies.domain_policies).map(([dom, rule]) => (
-                    <div key={dom} className="policy-row-item">
-                      <div className="policy-item-info">
-                        <div className="policy-item-top">
-                          <span
-                            className={`policy-badge ${
-                              rule.classification === "legitimate" ? "badge-legit" : "badge-phish"
-                            }`}
-                          >
-                            {rule.classification === "legitimate" ? "WHITELISTED" : "BLACKLISTED"}
-                          </span>
-                          <span className="policy-domain-name mono">{dom}</span>
-                        </div>
-                        <div className="policy-item-meta">
-                          <span className="policy-reason">{rule.reason}</span>
-                          <span className="policy-date">
-                            {new Date(rule.updated_at).toLocaleDateString([], {
-                              month: "short",
-                              day: "numeric",
-                            })}
-                          </span>
-                        </div>
-                      </div>
-                      <button
-                        className="btn-delete-policy"
-                        onClick={() => handleDeletePolicy(dom)}
-                        title={`Remove policy rule for ${dom}`}
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="empty-policy-box">
-                  <Globe size={24} className="text-muted" />
-                  <p>
-                    No active domain policy overrides yet. Use the form above to add an instant
-                    whitelist or blacklist rule.
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
         </section>
 
         {/* Live Traffic & Incident Log Table */}
@@ -1933,43 +1729,10 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
                 </table>
               </div>
 
-              {/* Active Governance Policies */}
-              <div className="audit-section">
-                <h4 className="audit-section-title">3. ACTIVE ORGANIZATIONAL ACCESS POLICIES</h4>
-                {policies && Object.keys(policies.domain_policies).length > 0 ? (
-                  <table className="audit-table">
-                    <thead>
-                      <tr>
-                        <th>Domain / Host</th>
-                        <th>Classification</th>
-                        <th>Target Risk</th>
-                        <th>Justification</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {Object.entries(policies.domain_policies).map(([dom, rule]) => (
-                        <tr key={dom}>
-                          <td className="mono">{dom}</td>
-                          <td>
-                            <strong>{rule.classification.toUpperCase()}</strong>
-                          </td>
-                          <td>{(rule.target_score * 100).toFixed(0)}%</td>
-                          <td>{rule.reason}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <p className="text-muted">
-                    No explicit domain policy overrides currently registered.
-                  </p>
-                )}
-              </div>
-
               {/* Recent Incident Log Highlights */}
               <div className="audit-section">
                 <h4 className="audit-section-title">
-                  4. RECENT INCIDENT LOG HIGHLIGHTS (TOP 15 EVENTS)
+                  3. RECENT INCIDENT LOG HIGHLIGHTS (TOP 15 EVENTS)
                 </h4>
                 <table className="audit-table">
                   <thead>
@@ -2224,27 +1987,6 @@ export default function AdminDashboard({ onNavigateScanner }: AdminDashboardProp
                         ))}
                       </div>
                     )}
-
-                  {/* One-Click Fleet Policy Enforcement */}
-                  <div className="ir-policy-actions">
-                    <span className="pa-title">Fleet Policy Action:</span>
-                    <button
-                      type="button"
-                      className="btn-quick-policy btn-qp-legit"
-                      onClick={() => handleQuickAddPolicyFromInspector("legitimate")}
-                    >
-                      <ShieldCheck size={14} />
-                      <span>Whitelist Domain</span>
-                    </button>
-                    <button
-                      type="button"
-                      className="btn-quick-policy btn-qp-phish"
-                      onClick={() => handleQuickAddPolicyFromInspector("phishing")}
-                    >
-                      <ShieldAlert size={14} />
-                      <span>Blacklist Domain</span>
-                    </button>
-                  </div>
                 </div>
               )}
             </div>

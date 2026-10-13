@@ -286,20 +286,6 @@ export const triggerRetraining = async (): Promise<RetrainingResponse> => {
   return response.data;
 };
 
-export interface DomainPolicyItem {
-  classification: "legitimate" | "phishing";
-  target_score: number;
-  reason: string;
-  updated_at: string;
-}
-
-export interface AdminPolicyData {
-  domain_policies: Record<string, DomainPolicyItem>;
-  email_patterns: Record<string, DomainPolicyItem>;
-  total_active_rules: number;
-  version: string;
-}
-
 export interface BenchmarkResponse {
   status: string;
   test_dataset: string;
@@ -324,31 +310,6 @@ export interface BenchmarkResponse {
     behavior_weight: number;
   };
 }
-
-export const fetchPolicies = async (): Promise<AdminPolicyData> => {
-  const response = await apiClient.get<{ status: string; data: AdminPolicyData }>("/admin/policies");
-  return response.data.data;
-};
-
-export const addDomainPolicy = async (payload: {
-  domain: string;
-  classification: "legitimate" | "phishing";
-  reason?: string;
-}): Promise<AdminPolicyData> => {
-  const response = await apiClient.post<{ status: string; message: string; data: AdminPolicyData }>(
-    "/admin/policies",
-    payload
-  );
-  return response.data.data;
-};
-
-export const deleteDomainPolicy = async (domain: string): Promise<AdminPolicyData> => {
-  const response = await apiClient.delete<{ status: string; message: string; data: AdminPolicyData }>(
-    "/admin/policies",
-    { data: { domain } }
-  );
-  return response.data.data;
-};
 
 export const fetchBenchmark = async (): Promise<BenchmarkResponse> => {
   const response = await apiClient.get<BenchmarkResponse>("/admin/benchmark");
