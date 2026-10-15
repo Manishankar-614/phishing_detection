@@ -1,5 +1,5 @@
 const DEFAULT_REMOTE_API =
-    "https://alternatively-roommates-recall-sur.trycloudflare.com/api";
+    "https://publications-forwarding-wishlist-aerial.trycloudflare.com/api";
 const LOCAL_API =
     "http://127.0.0.1:5000/api";
 
