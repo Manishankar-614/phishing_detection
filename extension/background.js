@@ -1,28 +1,59 @@
 const LOCAL_API =
     "http://127.0.0.1:5000/api";
+const LOCAL_API_LOCALHOST =
+    "http://localhost:5000/api";
 const DEFAULT_REMOTE_API =
-    "https://publications-forwarding-wishlist-aerial.trycloudflare.com/api";
+    "https://barrel-buffer-negotiations-lovely.trycloudflare.com/api";
 
-async function getApiBaseUrl() {
+async function postToBackend(payload) {
+    let customUrl = null;
     try {
         const stored = await chrome.storage.local.get("custom_api_url");
-        if (stored && stored.custom_api_url && typeof stored.custom_api_url === "string" && stored.custom_api_url.trim()) {
-            return stored.custom_api_url.trim().replace(/\/+$/, "");
+        if (stored?.custom_api_url && typeof stored.custom_api_url === "string" && stored.custom_api_url.trim()) {
+            customUrl = stored.custom_api_url.trim().replace(/\/+$/, "");
         }
     } catch (e) {}
 
-    // Check if local Flask server is running for instant 0ms latency
-    try {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 800);
-        const res = await fetch("http://127.0.0.1:5000/health", { signal: controller.signal });
-        clearTimeout(timer);
-        if (res.ok) {
-            return LOCAL_API;
-        }
-    } catch (e) {}
+    const endpoints = [];
+    if (customUrl) {
+        endpoints.push(`${customUrl}/analyze`);
+    }
+    endpoints.push(`${LOCAL_API}/analyze`);
+    endpoints.push(`${LOCAL_API_LOCALHOST}/analyze`);
+    endpoints.push(`${DEFAULT_REMOTE_API}/analyze`);
 
-    return DEFAULT_REMOTE_API;
+    let lastError = null;
+    for (const url of endpoints) {
+        try {
+            const controller = new AbortController();
+            const timeoutMs = url.includes("127.0.0.1") || url.includes("localhost") ? 2000 : 5000;
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+            const res = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify(payload),
+                signal: controller.signal
+            });
+            clearTimeout(timer);
+
+            if (res.ok) {
+                console.log(`[PhishGuard] Backend responded successfully via ${url}`);
+                return res;
+            } else {
+                const text = await res.text();
+                throw new Error(`Server returned HTTP ${res.status}: ${text}`);
+            }
+        } catch (err) {
+            console.warn(`[PhishGuard] Failed trying ${url}:`, err.message);
+            lastError = err;
+        }
+    }
+
+    throw new Error(`Unable to reach PhishGuard AI API on local (http://127.0.0.1:5000) or remote. Details: ${lastError?.message || "Connection refused"}`);
 }
 
 
@@ -210,6 +241,41 @@ chrome.tabs.onRemoved.addListener(
 
 
 // ============================================================
+// BADGE DISPLAY
+// ============================================================
+
+function updateActionBadge(tabId, result) {
+    if (!chrome.action) return;
+    try {
+        const risk = result?.risk || result?.result?.risk || {};
+        const riskScore = Number(risk?.risk_score ?? 0);
+        const classification = String(risk?.classification || "legitimate").toLowerCase();
+
+        let badgeText = "SAFE";
+        let badgeColor = "#10b981"; // Emerald green
+
+        if (classification === "phishing" || riskScore >= 0.70) {
+            badgeText = "RISK";
+            badgeColor = "#ef4444"; // Red
+        } else if (classification === "suspicious" || riskScore >= 0.40) {
+            badgeText = "WARN";
+            badgeColor = "#f59e0b"; // Amber
+        }
+
+        if (typeof tabId === "number") {
+            chrome.action.setBadgeText({ tabId, text: badgeText });
+            chrome.action.setBadgeBackgroundColor({ tabId, color: badgeColor });
+        } else {
+            chrome.action.setBadgeText({ text: badgeText });
+            chrome.action.setBadgeBackgroundColor({ color: badgeColor });
+        }
+    } catch (e) {
+        console.warn("[PhishGuard] Failed to update action badge:", e);
+    }
+}
+
+
+// ============================================================
 // CONTENT SCRIPT MESSAGES
 // ============================================================
 
@@ -322,6 +388,8 @@ chrome.runtime.onMessage.addListener(
 
                 (result) => {
 
+                    updateActionBadge(sender?.tab?.id ?? tabId, result);
+
                     sendResponse({
 
                         success:
@@ -381,6 +449,12 @@ chrome.runtime.onMessage.addListener(
             .then(
 
                 (result) => {
+
+                    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                        if (tabs && tabs[0]) {
+                            updateActionBadge(tabs[0].id, result);
+                        }
+                    });
 
                     sendResponse({
 
@@ -696,43 +770,7 @@ async function analyzePage(
     // SEND TO FLASK
     // ========================================================
 
-    let response;
-    const baseApi = await getApiBaseUrl();
-
-    try {
-        response = await fetch(
-            `${baseApi}/analyze`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                },
-                body: JSON.stringify(payload)
-            }
-        );
-    } catch (error) {
-        if (baseApi !== LOCAL_API) {
-            console.warn("Primary API endpoint unreachable, attempting fallback to local API...");
-            try {
-                response = await fetch(
-                    `${LOCAL_API}/analyze`,
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Accept": "application/json"
-                        },
-                        body: JSON.stringify(payload)
-                    }
-                );
-            } catch (fallbackError) {
-                throw new Error("Unable to connect to PhishGuard AI API (cloud and local both unreachable). Please ensure the backend server or tunnel is running.");
-            }
-        } else {
-            throw new Error("Unable to connect to Flask API. " + error.message);
-        }
-    }
+    const response = await postToBackend(payload);
 
     // ========================================================
     // READ RESPONSE

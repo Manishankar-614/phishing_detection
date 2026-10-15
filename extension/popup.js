@@ -125,6 +125,10 @@ async function initialize() {
             displayResult(
                 stored.latestPhishingResult
             );
+        } else if (tab.url.startsWith("http://") || tab.url.startsWith("https://")) {
+            setTimeout(() => {
+                analyzeButton.click();
+            }, 50);
         }
 
     }
@@ -244,60 +248,69 @@ analyzeButton.addEventListener(
 
 
             // ----------------------------------------------------
-            // GET PAGE DATA
+            // CHECK BROWSER INTERNAL PAGES
             // ----------------------------------------------------
 
-            const pageData =
-                await new Promise(
-                    (
-                        resolve,
-                        reject
-                    ) => {
-
-                        chrome.tabs.sendMessage(
-                            tab.id,
-                            {
-                                type:
-                                    "GET_PAGE_DATA"
-                            },
-                            (response) => {
-
-                                if (
-                                    chrome.runtime.lastError
-                                ) {
-
-                                    reject(
-                                        new Error(
-                                            "Unable to communicate with the webpage. Refresh the page and try again."
-                                        )
-                                    );
-
-                                    return;
-                                }
-
-
-                                if (
-                                    !response ||
-                                    !response.success
-                                ) {
-
-                                    reject(
-                                        new Error(
-                                            "Unable to collect webpage data."
-                                        )
-                                    );
-
-                                    return;
-                                }
-
-
-                                resolve(
-                                    response.data
-                                );
-                            }
-                        );
-                    }
+            if (
+                tab.url.startsWith("chrome://") ||
+                tab.url.startsWith("edge://") ||
+                tab.url.startsWith("about:") ||
+                tab.url.startsWith("chrome-extension://")
+            ) {
+                throw new Error(
+                    "Internal browser pages cannot be scanned. Please open an external website or email to scan."
                 );
+            }
+
+            // ----------------------------------------------------
+            // GET PAGE DATA (with non-blocking fallback)
+            // ----------------------------------------------------
+
+            let pageData = {
+                url: tab.url,
+                page_url: tab.url,
+                title: tab.title || "",
+                is_email_page: false,
+                email: "",
+                email_urls: [],
+                email_links: [],
+                behavior: {
+                    num_clicks: 0,
+                    time_on_page: 1,
+                    num_redirects: 0,
+                    failed_logins: 0,
+                    mouse_speed: 0,
+                    typing_speed: 0,
+                    tab_switches: 0
+                }
+            };
+
+            try {
+                const domData = await new Promise((resolve) => {
+                    const timer = setTimeout(() => {
+                        resolve(null);
+                    }, 400);
+
+                    chrome.tabs.sendMessage(
+                        tab.id,
+                        { type: "GET_PAGE_DATA" },
+                        (response) => {
+                            clearTimeout(timer);
+                            if (chrome.runtime.lastError || !response || !response.success) {
+                                resolve(null);
+                            } else {
+                                resolve(response.data);
+                            }
+                        }
+                    );
+                });
+
+                if (domData && typeof domData === "object") {
+                    pageData = { ...pageData, ...domData };
+                }
+            } catch (ignored) {
+                // Keep default fallback
+            }
 
 
             // ----------------------------------------------------

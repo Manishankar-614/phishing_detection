@@ -20,9 +20,17 @@ def create_app():
 
     CORS(
         app,
-        resources={r"/*": {"origins": cors_origins}},
-        supports_credentials=True,
+        resources={r"/*": {"origins": "*"}},
+        supports_credentials=False,
     )
+
+    @app.after_request
+    def add_cors_headers(response):
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin"
+        response.headers["Access-Control-Allow-Private-Network"] = "true"
+        return response
 
     # ============================================================
     # REGISTER BLUEPRINTS
