@@ -1,7 +1,7 @@
-const DEFAULT_REMOTE_API =
-    "https://publications-forwarding-wishlist-aerial.trycloudflare.com/api";
 const LOCAL_API =
     "http://127.0.0.1:5000/api";
+const DEFAULT_REMOTE_API =
+    "https://publications-forwarding-wishlist-aerial.trycloudflare.com/api";
 
 async function getApiBaseUrl() {
     try {
@@ -10,6 +10,18 @@ async function getApiBaseUrl() {
             return stored.custom_api_url.trim().replace(/\/+$/, "");
         }
     } catch (e) {}
+
+    // Check if local Flask server is running for instant 0ms latency
+    try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 800);
+        const res = await fetch("http://127.0.0.1:5000/health", { signal: controller.signal });
+        clearTimeout(timer);
+        if (res.ok) {
+            return LOCAL_API;
+        }
+    } catch (e) {}
+
     return DEFAULT_REMOTE_API;
 }
 

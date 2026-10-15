@@ -1349,31 +1349,18 @@ function requestAutomaticAnalysis() {
         },
 
         (response) => {
-
-            if (
-                chrome.runtime.lastError
-            ) {
-
+            if (chrome.runtime.lastError) {
+                console.warn("[PhishGuard] Auto analysis runtime error:", chrome.runtime.lastError.message);
                 return;
-
             }
 
-
-            if (
-                response &&
-                response.success
-            ) {
-
-                lastAnalysisFingerprint =
-                    fingerprint;
-
-
-                showAutomaticResult(
-                    response.result
-                );
-
+            if (response && response.success) {
+                lastAnalysisFingerprint = fingerprint;
+                console.log("[PhishGuard] Analysis completed for page:", pageData.page_url, response.result);
+                showAutomaticResult(response.result);
+            } else if (response && response.error) {
+                console.error("[PhishGuard] Analysis failed:", response.error);
             }
-
         }
 
     );
@@ -2313,18 +2300,7 @@ setInterval(
 // ============================================================
 
 function startAutomaticAnalysis() {
-
-    setTimeout(
-        () => {
-
-            scheduleAutomaticAnalysis(
-                500
-            );
-
-        },
-        2500
-    );
-
+    scheduleAutomaticAnalysis(300);
 }
 
 
