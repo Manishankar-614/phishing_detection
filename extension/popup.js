@@ -125,10 +125,6 @@ async function initialize() {
             displayResult(
                 stored.latestPhishingResult
             );
-        } else if (tab.url.startsWith("http://") || tab.url.startsWith("https://")) {
-            setTimeout(() => {
-                analyzeButton.click();
-            }, 50);
         }
 
     }
@@ -208,9 +204,16 @@ function showSafeState() {
 // MANUAL ANALYZE
 // ============================================================
 
+let isAnalyzing = false;
+
 analyzeButton.addEventListener(
     "click",
     async () => {
+
+        if (isAnalyzing) {
+            return;
+        }
+        isAnalyzing = true;
 
         hideError();
 
@@ -289,7 +292,7 @@ analyzeButton.addEventListener(
                 const domData = await new Promise((resolve) => {
                     const timer = setTimeout(() => {
                         resolve(null);
-                    }, 400);
+                    }, 120);
 
                     chrome.tabs.sendMessage(
                         tab.id,
@@ -415,6 +418,8 @@ analyzeButton.addEventListener(
 
         }
         finally {
+
+            isAnalyzing = false;
 
             loading.classList.add(
                 "hidden"

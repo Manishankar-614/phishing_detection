@@ -19,41 +19,46 @@ async function postToBackend(payload) {
         endpoints.push(`${customUrl}/analyze`);
     }
     endpoints.push(`${LOCAL_API}/analyze`);
-    endpoints.push(`${LOCAL_API_LOCALHOST}/analyze`);
     endpoints.push(`${DEFAULT_REMOTE_API}/analyze`);
 
-    let lastError = null;
-    for (const url of endpoints) {
-        try {
-            const controller = new AbortController();
-            const timeoutMs = url.includes("127.0.0.1") || url.includes("localhost") ? 2000 : 5000;
-            const timer = setTimeout(() => controller.abort(), timeoutMs);
+    const jsonPayload = JSON.stringify(payload);
 
+    async function queryEndpoint(url, timeoutMs) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
+        try {
             const res = await fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Accept": "application/json"
                 },
-                body: JSON.stringify(payload),
+                body: jsonPayload,
                 signal: controller.signal
             });
             clearTimeout(timer);
-
             if (res.ok) {
-                console.log(`[PhishGuard] Backend responded successfully via ${url}`);
+                console.log(`[PhishGuard] Backend responded via ${url}`);
                 return res;
-            } else {
-                const text = await res.text();
-                throw new Error(`Server returned HTTP ${res.status}: ${text}`);
             }
+            const text = await res.text();
+            throw new Error(`HTTP ${res.status}: ${text}`);
         } catch (err) {
-            console.warn(`[PhishGuard] Failed trying ${url}:`, err.message);
-            lastError = err;
+            clearTimeout(timer);
+            throw err;
         }
     }
 
-    throw new Error(`Unable to reach PhishGuard AI API on local (http://127.0.0.1:5000) or remote. Details: ${lastError?.message || "Connection refused"}`);
+    try {
+        // Run requests concurrently so local (~150ms) or fastest endpoint wins instantly
+        const requests = endpoints.map((url) => {
+            const timeout = url.includes("127.0.0.1") ? 3000 : 6000;
+            return queryEndpoint(url, timeout);
+        });
+        return await Promise.any(requests);
+    } catch (allFailed) {
+        throw new Error("Unable to connect to PhishGuard AI API (backend server and remote tunnel both unreachable). Please ensure Flask backend is running on http://127.0.0.1:5000.");
+    }
 }
 
 
